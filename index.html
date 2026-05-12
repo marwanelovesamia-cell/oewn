@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إلى أميرتي سامية ❤️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; background: #000; color: white; font-family: 'Cairo', sans-serif; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        canvas { position: absolute; top: 0; left: 0; z-index: 1; }
+        .content { position: relative; z-index: 10; text-align: center; width: 80%; }
+        .message { font-size: 1.8rem; line-height: 1.6; text-shadow: 0 0 15px #ff0055; opacity: 0; transition: opacity 1.5s; display: none; }
+        .active { display: block; opacity: 1; }
+        .btn-start { padding: 15px 35px; background: #ff0055; color: white; border: none; border-radius: 50px; font-size: 1.3rem; cursor: pointer; box-shadow: 0 0 20px rgba(255, 0, 85, 0.5); transition: 0.3s; }
+        .btn-start:hover { transform: scale(1.1); background: #ff3377; }
+        #final-name { font-size: 3.5rem; color: #ff0055; font-weight: bold; animation: heartbeat 1.5s infinite; }
+        @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <canvas id="stars"></canvas>
+    <div class="content">
+        <div id="welcome-screen">
+            <h1 style="font-size: 2.5rem; margin-bottom: 20px;">عالم سامية الخاص ✨</h1>
+            <p style="margin-bottom: 30px;">هذا الرابط صنعته لكِ وحدي بجهد وحب كبير..</p>
+            <button class="btn-start" onclick="startExperience()">اضغطي هنا يا ملكتي ⬇️</button>
+        </div>
+
+        <div id="messages-container">
+            <div class="message">مرحباً بكِ في عالم مروان.. حيث كل شيء هنا يتحدث عنكِ.</div>
+            <div class="message">هل تعرفين الحقيقة؟ أنتِ أجمل ما حدث لي في حياتي.</div>
+            <div class="message">أحب شعركِ، عيناكِ، وكل تفصيلة صغيرة فيكِ.</div>
+            <div class="message">لا أعرف لماذا أفعل هذا.. ربما لأنني أحبكِ بجنون ولا أريد فقدانكِ.</div>
+            <div class="message">هل ستكونين في مستقبلي؟ أنا أبني كل أحلامي عليكِ.</div>
+            <div class="message" id="final-name">أحبكِ يا سامية ❤️👑</div>
+        </div>
+    </div>
+
+    <script>
+        function startExperience() {
+            document.getElementById('welcome-screen').style.display = 'none';
+            const msgs = document.querySelectorAll('.message');
+            let i = 0;
+            function showNext() {
+                if (i > 0) msgs[i-1].classList.remove('active');
+                if (i < msgs.length) {
+                    msgs[i].classList.add('active');
+                    i++;
+                    setTimeout(showNext, 4000);
+                }
+            }
+            showNext();
+        }
+
+        // كود خلفية النجوم المتساقطة
+        const canvas = document.getElementById('stars');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const stars = Array(200).fill().map(() => ({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, size: Math.random() * 2, spd: Math.random() * 0.5 + 0.2 }));
+        function draw() {
+            ctx.fillStyle = 'black'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'white';
+            stars.forEach(s => {
+                ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill();
+                s.y += s.spd; if (s.y > canvas.height) s.y = 0;
+            });
+            requestAnimationFrame(draw);
+        }
+        draw();
+    </script>
+</body>
+</html>
