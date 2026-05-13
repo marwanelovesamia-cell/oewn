@@ -15,7 +15,7 @@
         #portal-container { display: none; flex-direction: column; align-items: center; cursor: pointer; margin-top: 20px; }
         .wormhole-core { width: 80px; height: 80px; background: #000; border-radius: 50%; box-shadow: 0 0 40px #8a2be2, inset 0 0 30px #000, 0 0 70px #fff; animation: pulse 2s infinite ease-in-out; border: 1px solid rgba(255,255,255,0.3); }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-        #final-text { position: fixed; inset: 0; z-index: 200; display: none; justify-content: center; align-items: center; text-align: center; font-size: 32px; font-weight: bold; pointer-events: none; text-shadow: 0 0 20px #8a2be2, 0 0 40px #fff; animation: floatFinal 6s infinite ease-in-out; padding: 20px; color: #fff; }
+        #final-text { position: fixed; inset: 0; z-index: 200; display: none; justify-content: center; align-items: center; text-align: center; font-size: 30px; font-weight: bold; pointer-events: none; text-shadow: 0 0 20px #8a2be2, 0 0 40px #fff; animation: floatFinal 5s infinite ease-in-out; padding: 20px; color: #fff; }
         @keyframes floatFinal { 0%, 100% { transform: translateY(0); opacity: 0.8; } 50% { transform: translateY(-30px); opacity: 1; } }
     </style>
 </head>
@@ -35,31 +35,38 @@
         let isTraveling = false, clock = new THREE.Clock();
         function init() {
             scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 35000);
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 40000);
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             document.body.appendChild(renderer.domElement);
             const geo = new THREE.BufferGeometry();
             const pos = [];
-            for(let i=0; i<250000; i++) pos.push(THREE.MathUtils.randFloatSpread(20000), THREE.MathUtils.randFloatSpread(20000), THREE.MathUtils.randFloatSpread(20000));
+            for(let i=0; i<300000; i++) pos.push(THREE.MathUtils.randFloatSpread(25000), THREE.MathUtils.randFloatSpread(25000), THREE.MathUtils.randFloatSpread(25000));
             geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-            starSystem = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0x8a2be2, size: 2, transparent: true, blending: THREE.AdditiveBlending }));
+            starSystem = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0x8a2be2, size: 2.5, transparent: true, blending: THREE.AdditiveBlending }));
             scene.add(starSystem);
-            camera.position.z = 3000;
+            camera.position.z = 4000;
             animate();
         }
         function animate() {
             requestAnimationFrame(animate);
-            starSystem.rotation.y += 0.0005;
+            starSystem.rotation.y += 0.0003;
             if (isTraveling) {
                 const time = clock.getElapsedTime();
                 if (time < 60) {
-                    camera.position.z -= 15;
-                    starSystem.material.color.setHSL((time / 60), 0.7, 0.5); // تغيير الألوان تدريجياً
+                    camera.position.z -= 20;
+                    // تقسيم الألوان: كل 20 ثانية لون مختلف
+                    if (time < 20) {
+                        starSystem.material.color.setHex(0x8a2be2); // 0-20ث: بنفسجي
+                    } else if (time < 40) {
+                        starSystem.material.color.setHex(0x00ff88); // 20-40ث: أخضر فسفوري
+                    } else {
+                        starSystem.material.color.setHex(0xff00ff); // 40-60ث: وردي/بنفسجي فاتح
+                    }
                 } else {
                     isTraveling = false;
-                    starSystem.material.color.setHex(0x8a2be2); // العودة للبنفسجي في النهاية
+                    starSystem.material.color.setHex(0x8a2be2); // النهاية: بنفسجي ثابت
                     document.getElementById('final-text').style.display = 'flex';
                 }
             }
@@ -75,7 +82,6 @@
         }
         window.launchSpaceMission = () => { isTraveling = true; clock.start(); document.getElementById('bgMusic').play(); document.getElementById('ui-wrapper').style.opacity = '0'; setTimeout(() => { document.getElementById('ui-wrapper').style.display = 'none'; }, 1000); }
         init();
-        window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
     </script>
 </body>
 </html>
