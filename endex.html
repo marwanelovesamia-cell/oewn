@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>Infinity Journey - Samia</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+        body { margin: 0; background: #000; overflow: hidden; font-family: 'Cairo', sans-serif; color: white; }
+        canvas { position: fixed; inset: 0; z-index: 1; }
+
+        #ui-wrapper {
+            position: fixed; inset: 0; z-index: 100;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+
+        .glass-card {
+            background: rgba(10, 5, 20, 0.8); backdrop-filter: blur(20px);
+            border: 2px solid #8a2be2; padding: 40px; border-radius: 30px; 
+            text-align: center; max-width: 850px; box-shadow: 0 0 50px rgba(138, 43, 226, 0.5);
+        }
+
+        #typewriter { font-size: 24px; line-height: 1.8; color: #fff; min-height: 100px; }
+
+        .btn {
+            background: none; border: 1px solid #fff; color: #fff;
+            padding: 12px 40px; border-radius: 50px; cursor: pointer;
+            font-size: 18px; margin-top: 25px; transition: 0.5s;
+        }
+        .btn:hover { background: #fff; color: #000; box-shadow: 0 0 30px #fff; }
+
+        #portal-container {
+            display: none; flex-direction: column; align-items: center; cursor: pointer; margin-top: 35px;
+        }
+        .wormhole-core {
+            width: 130px; height: 130px; background: #000; border-radius: 50%;
+            box-shadow: 0 0 60px #8a2be2, inset 0 0 40px #000, 0 0 100px #fff;
+            position: relative; animation: pulse 2s infinite ease-in-out;
+        }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+        #final-text {
+            position: fixed; inset: 0; z-index: 200; display: none;
+            justify-content: center; align-items: center; text-align: center;
+            font-size: 45px; font-weight: bold; pointer-events: none;
+            text-shadow: 0 0 30px #8a2be2, 0 0 50px #fff;
+            animation: fadeInOut 5s forwards;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ui-wrapper">
+        <div class="glass-card" id="scr1">
+            <h1 style="font-size: 45px;">Welcome Samia</h1>
+            <p>Welcome to a world of my creation</p>
+            <button class="btn" onclick="next(1,2)">Enter</button>
+        </div>
+        <div class="glass-card" id="scr2" style="display:none">
+            <p>مرحباً، هذا صنع في اليوم 2026.4.12... مصنوع بيد شخص رخص وقته ليعبر لكِ عما في قلبه.</p>
+            <button class="btn" onclick="next(2,3)">التالي</button>
+        </div>
+        <div class="glass-card" id="scr3" style="display:none">
+            <p style="font-size: 32px; font-weight: bold;">أولاً سأقول لكِ شيئاً..</p>
+            <button class="btn" onclick="next(3,4)">استمر</button>
+        </div>
+        <div class="glass-card" id="scr4" style="display:none">
+            <div id="typewriter"></div>
+            <div id="portal-container" onclick="launchSpaceMission()">
+                <div class="wormhole-core"></div>
+                <p style="margin-top: 15px; letter-spacing: 5px; font-weight: bold; color: #fff;">صافري</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="final-text">That’s all there is, my dear.</div>
+
+    <script type="importmap"> { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } } </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        let scene, camera, renderer, starSystem, wormholeMesh, galaxyMesh;
+        let isTraveling = false, clock = new THREE.Clock();
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 20000);
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            // 1. النجوم البنفسجية (البداية)
+            const geo = new THREE.BufferGeometry();
+            const pos = [];
+            for(let i=0; i<70000; i++) pos.push(THREE.MathUtils.randFloatSpread(8000), THREE.MathUtils.randFloatSpread(8000), THREE.MathUtils.randFloatSpread(6000));
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+            starSystem = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0x8a2be2, size: 1.5, transparent: true }));
+            scene.add(starSystem);
+
+            // 2. النفق الدودي (ألوان باهتة)
+            const tunnelGeo = new THREE.CylinderGeometry(50, 50, 5000, 64, 1, true);
+            const tunnelMat = new THREE.MeshBasicMaterial({ color: 0x443355, wireframe: true, transparent: true, opacity: 0, side: THREE.BackSide });
+            wormholeMesh = new THREE.Mesh(tunnelGeo, tunnelMat);
+            wormholeMesh.rotation.x = Math.PI / 2;
+            scene.add(wormholeMesh);
+
+            // 3. الشيء الأسطوري (المجرة)
+            const galGeo = new THREE.TorusKnotGeometry(40, 15, 200, 20);
+            const galMat = new THREE.MeshNormalMaterial({ transparent: true, opacity: 0 });
+            galaxyMesh = new THREE.Mesh(galGeo, galMat);
+            scene.add(galaxyMesh);
+
+            camera.position.z = 1500;
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            starSystem.rotation.y += 0.0003;
+
+            if (isTraveling) {
+                const time = clock.getElapsedTime();
+
+                // المرحلة 1: ثقب دودي باهت وبطء (0-10 ثانية)
+                if (time < 10) {
+                    camera.position.z -= 2;
+                    wormholeMesh.material.opacity = 0.4;
+                    wormholeMesh.rotation.y += 0.02;
+                    starSystem.material.color.setHSL(0.7, 0.1, 0.3); // باهت
+                }
+                // المرحلة 2: نجوم خضراء كثيفة ببطء (10-20 ثانية)
+                else if (time < 20) {
+                    wormholeMesh.material.opacity -= 0.05;
+                    starSystem.material.color.setHex(0x00ff88); // أخضر كثيف
+                    camera.position.z -= 1;
+                    starSystem.rotation.z += 0.005;
+                }
+                // المرحلة 3: الاندفاع الأسطوري (20-30 ثانية)
+                else if (time < 30) {
+                    galaxyMesh.material.opacity = 0.8;
+                    galaxyMesh.rotation.x += 0.05;
+                    galaxyMesh.rotation.y += 0.05;
+                    galaxyMesh.scale.set(time, time, time);
+                    starSystem.material.color.setHSL((time * 0.2) % 1, 0.8, 0.5); // ألوان جنونية
+                    camera.position.z -= 15;
+                }
+                else {
+                    endAll();
+                }
+            }
+            renderer.render(scene, camera);
+        }
+
+        window.next = (oldS, newS) => {
+            document.getElementById(`scr${oldS}`).style.display = 'none';
+            document.getElementById(`scr${newS}`).style.display = 'block';
+            if(newS === 4) typeText();
+        }
+
+        function typeText() {
+            const msg = "شوفي بغيت نقول لك هادشي لدجا قولتو لك مرات بزاف نتي عارفا بلي أنا كنبغيك امكن وعارفة كولشي أو وضحت لك نيتي أو مهم راك عارفة كل شيء ولكن راك مبغيتش تعرفي والو مبغيتش تعرفي بلي كنبغيك صراحة بديت كنبغيك من نهار تلاقيتك دك نهار في مدينة معندي مدنير كنكره هاكا مباغيش نتصاحب باغي نبقا طنروكيل، أصلا ماشي عيب تبغي شي حد يك المهم لحاجة لباغي دجا قلته لك نبقاو ديما على تواصل واخة تكوني نتي مباغيانيش ، انبغيك بحال ختي أو نتي بغيني بحال خوك (كنحس بلي أنا درامي ناري مهم فهمي شنو بغيت نوصل لك اوصفي ) .";
+            let i = 0;
+            const container = document.getElementById('typewriter');
+            function type() {
+                if (i < msg.length) { container.innerHTML += msg.charAt(i); i++; setTimeout(type, 40); }
+                else document.getElementById('portal-container').style.display = 'flex';
+            }
+            type();
+        }
+
+        window.launchSpaceMission = () => {
+            isTraveling = true;
+            clock.start();
+            document.getElementById('ui-wrapper').style.opacity = '0';
+            setTimeout(() => { document.getElementById('ui-wrapper').style.display = 'none'; }, 1000);
+        }
+
+        function endAll() {
+            isTraveling = false;
+            camera.position.set(0, 0, 1500);
+            starSystem.material.color.setHex(0x8a2be2);
+            galaxyMesh.material.opacity = 0;
+            document.getElementById('final-text').style.display = 'flex';
+        }
+
+        init();
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
+استخدم هاذا وزد موسيقى هادئة و زد من جمال رحلة لا تنقص شيء
