@@ -8,80 +8,201 @@
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
         body { margin: 0; background: #000; overflow: hidden; font-family: 'Cairo', sans-serif; color: white; touch-action: manipulation; }
         canvas { position: fixed; inset: 0; z-index: 1; }
-        #ui-wrapper { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; transition: opacity 1s; }
-        .glass-card { background: rgba(8, 4, 15, 0.9); backdrop-filter: blur(15px); border: 1.5px solid #8a2be2; padding: 25px; border-radius: 25px; text-align: center; width: 88%; max-width: 400px; box-shadow: 0 0 30px rgba(138, 43, 226, 0.4); }
-        #typewriter { font-size: 18px; line-height: 1.7; color: #e0d5ff; min-height: 80px; text-align: right; direction: rtl; }
-        .btn { background: transparent; border: 1px solid #fff; color: #fff; padding: 10px 30px; border-radius: 50px; cursor: pointer; font-size: 16px; margin-top: 15px; font-weight: bold; }
-        #portal-container { display: none; flex-direction: column; align-items: center; cursor: pointer; margin-top: 20px; }
-        .wormhole-core { width: 80px; height: 80px; background: #000; border-radius: 50%; box-shadow: 0 0 40px #8a2be2, inset 0 0 30px #000, 0 0 70px #fff; animation: pulse 2s infinite ease-in-out; border: 1px solid rgba(255,255,255,0.3); }
+
+        #ui-wrapper {
+            position: fixed; inset: 0; z-index: 100;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 15px; transition: opacity 1s ease;
+        }
+
+        .glass-card {
+            background: rgba(8, 4, 15, 0.9); backdrop-filter: blur(15px);
+            border: 1.5px solid #8a2be2; padding: 25px; border-radius: 25px; 
+            text-align: center; width: 88%; max-width: 400px;
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.4);
+        }
+
+        h1 { font-size: 28px; margin-bottom: 10px; }
+        p { font-size: 18px; line-height: 1.5; margin: 10px 0; }
+
+        #typewriter { 
+            font-size: 18px; line-height: 1.7; color: #e0d5ff; 
+            min-height: 80px; text-align: right; direction: rtl; 
+        }
+
+        .btn {
+            background: transparent; border: 1px solid #fff; color: #fff;
+            padding: 10px 30px; border-radius: 50px; cursor: pointer;
+            font-size: 16px; margin-top: 15px; font-weight: bold;
+        }
+
+        #portal-container {
+            display: none; flex-direction: column; align-items: center; cursor: pointer; margin-top: 20px;
+        }
+        .wormhole-core {
+            width: 80px; height: 80px; background: #000; border-radius: 50%;
+            box-shadow: 0 0 40px #8a2be2, inset 0 0 30px #000, 0 0 70px #fff;
+            animation: pulse 2s infinite ease-in-out; border: 1px solid rgba(255,255,255,0.3);
+        }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-        #final-text { position: fixed; inset: 0; z-index: 200; display: none; justify-content: center; align-items: center; text-align: center; font-size: 30px; font-weight: bold; pointer-events: none; text-shadow: 0 0 20px #8a2be2, 0 0 40px #fff; animation: floatFinal 5s infinite ease-in-out; padding: 20px; color: #fff; }
-        @keyframes floatFinal { 0%, 100% { transform: translateY(0); opacity: 0.8; } 50% { transform: translateY(-30px); opacity: 1; } }
+
+        #final-text {
+            position: fixed; inset: 0; z-index: 200; display: none;
+            justify-content: center; align-items: center; text-align: center;
+            font-size: 32px; font-weight: bold; pointer-events: none;
+            text-shadow: 0 0 20px #8a2be2, 0 0 40px #fff;
+            animation: floatText 6s infinite ease-in-out; padding: 20px;
+        }
+        @keyframes floatText { 0%, 100% { transform: translateY(0); opacity: 0.8; } 50% { transform: translateY(-20px); opacity: 1; } }
     </style>
 </head>
 <body>
-    <audio id="bgMusic" loop><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" type="audio/mpeg"></audio>
+
+    <audio id="bgMusic" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" type="audio/mpeg">
+    </audio>
+
     <div id="ui-wrapper">
-        <div class="glass-card" id="scr1"><h1>Welcome Samia</h1><p>Welcome to a world of my creation</p><button class="btn" onclick="next(1,2)">Enter</button></div>
-        <div class="glass-card" id="scr2" style="display:none"><p>مرحباً، هذا صنع في اليوم 2026.4.12... مصنوع بيد شخص رخص وقته ليعبر لكِ عما في قلبه.</p><button class="btn" onclick="next(2,3)">التالي</button></div>
-        <div class="glass-card" id="scr3" style="display:none"><p style="font-size: 22px; font-weight: bold;">أولاً سأقول لكِ شيئاً..</p><button class="btn" onclick="next(3,4)">استمر</button></div>
-        <div class="glass-card" id="scr4" style="display:none"><div id="typewriter"></div><div id="portal-container" onclick="launchSpaceMission()"><div class="wormhole-core"></div><p style="margin-top: 10px; font-weight: bold; color: #fff; font-size: 18px;">صافري</p></div></div>
+        <div class="glass-card" id="scr1">
+            <h1>Welcome Samia</h1>
+            <p>Welcome to a world of my creation</p>
+            <button class="btn" onclick="next(1,2)">Enter</button>
+        </div>
+        <div class="glass-card" id="scr2" style="display:none">
+            <p>مرحباً، هذا صنع في اليوم 2026.4.12... مصنوع بيد شخص رخص وقته ليعبر لكِ عما في قلبه.</p>
+            <button class="btn" onclick="next(2,3)">التالي</button>
+        </div>
+        <div class="glass-card" id="scr3" style="display:none">
+            <p style="font-size: 22px; font-weight: bold;">أولاً سأقول لكِ شيئاً..</p>
+            <button class="btn" onclick="next(3,4)">استمر</button>
+        </div>
+        <div class="glass-card" id="scr4" style="display:none">
+            <div id="typewriter"></div>
+            <div id="portal-container" onclick="launchSpaceMission()">
+                <div class="wormhole-core"></div>
+                <p style="margin-top: 10px; font-weight: bold; color: #fff; font-size: 18px;">صافري</p>
+            </div>
+        </div>
     </div>
+
     <div id="final-text">That’s all there is, my dear.</div>
+
     <script type="importmap"> { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } } </script>
+
     <script type="module">
         import * as THREE from 'three';
-        let scene, camera, renderer, starSystem;
+
+        let scene, camera, renderer, starSystem, wormholeMesh, galaxyMesh;
         let isTraveling = false, clock = new THREE.Clock();
+
         function init() {
             scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 40000);
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 30000);
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             document.body.appendChild(renderer.domElement);
+
+            // نجوم هائلة ولامعة (200,000 نجمة)
             const geo = new THREE.BufferGeometry();
             const pos = [];
-            for(let i=0; i<300000; i++) pos.push(THREE.MathUtils.randFloatSpread(25000), THREE.MathUtils.randFloatSpread(25000), THREE.MathUtils.randFloatSpread(25000));
+            for(let i=0; i<200000; i++) {
+                pos.push(THREE.MathUtils.randFloatSpread(15000), THREE.MathUtils.randFloatSpread(15000), THREE.MathUtils.randFloatSpread(12000));
+            }
             geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-            starSystem = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0x8a2be2, size: 2.5, transparent: true, blending: THREE.AdditiveBlending }));
+            starSystem = new THREE.Points(geo, new THREE.PointsMaterial({ 
+                color: 0x8a2be2, 
+                size: 2, 
+                transparent: true,
+                blending: THREE.AdditiveBlending 
+            }));
             scene.add(starSystem);
-            camera.position.z = 4000;
+
+            // نفق دودي مخفي في البداية
+            const tunnelGeo = new THREE.CylinderGeometry(50, 50, 10000, 32, 1, true);
+            const tunnelMat = new THREE.MeshBasicMaterial({ color: 0x443355, wireframe: true, transparent: true, opacity: 0, side: THREE.BackSide });
+            wormholeMesh = new THREE.Mesh(tunnelGeo, tunnelMat);
+            wormholeMesh.rotation.x = Math.PI / 2;
+            scene.add(wormholeMesh);
+
+            // المجرة النهائية الأسطورية
+            const galGeo = new THREE.TorusKnotGeometry(45, 12, 150, 20);
+            const galMat = new THREE.MeshNormalMaterial({ transparent: true, opacity: 0 });
+            galaxyMesh = new THREE.Mesh(galGeo, galMat);
+            scene.add(galaxyMesh);
+
+            camera.position.z = 2500;
             animate();
         }
+
         function animate() {
             requestAnimationFrame(animate);
-            starSystem.rotation.y += 0.0003;
+            starSystem.rotation.y += 0.0004;
+
             if (isTraveling) {
                 const time = clock.getElapsedTime();
-                if (time < 60) {
-                    camera.position.z -= 20;
-                    // تقسيم الألوان: كل 20 ثانية لون مختلف
-                    if (time < 20) {
-                        starSystem.material.color.setHex(0x8a2be2); // 0-20ث: بنفسجي
-                    } else if (time < 40) {
-                        starSystem.material.color.setHex(0x00ff88); // 20-40ث: أخضر فسفوري
-                    } else {
-                        starSystem.material.color.setHex(0xff00ff); // 40-60ث: وردي/بنفسجي فاتح
-                    }
-                } else {
-                    isTraveling = false;
-                    starSystem.material.color.setHex(0x8a2be2); // النهاية: بنفسجي ثابت
-                    document.getElementById('final-text').style.display = 'flex';
+
+                if (time < 10) {
+                    camera.position.z -= 5;
+                    wormholeMesh.material.opacity = 0.3;
+                    wormholeMesh.rotation.y += 0.03;
+                }
+                else if (time < 20) {
+                    wormholeMesh.material.opacity -= 0.01;
+                    starSystem.material.color.setHex(0x00ff88); // تحول للأخضر
+                    camera.position.z -= 8;
+                }
+                else if (time < 30) {
+                    galaxyMesh.material.opacity = 0.8;
+                    galaxyMesh.rotation.x += 0.04;
+                    galaxyMesh.rotation.y += 0.04;
+                    galaxyMesh.scale.set(time*0.6, time*0.6, time*0.6);
+                    camera.position.z -= 25;
+                }
+                else {
+                    endAll();
                 }
             }
             renderer.render(scene, camera);
         }
-        window.next = (o, n) => { document.getElementById(`scr${o}`).style.display = 'none'; document.getElementById(`scr${n}`).style.display = 'block'; if(n === 4) typeText(); }
+
+        window.next = (oldS, newS) => {
+            document.getElementById(`scr${oldS}`).style.display = 'none';
+            document.getElementById(`scr${newS}`).style.display = 'block';
+            if(newS === 4) typeText();
+        }
+
         function typeText() {
             const msg = "شوفي بغيت نقول لك هادشي لدجا قولتو لك مرات بزاف نتي عارفا بلي أنا كنبغيك امكن وعارفة كولشي أو وضحت لك نيتي أو مهم راك عارفة كل شيء ولكن راك مبغيتش تعرفي والو مبغيتش تعرفي بلي كنبغيك صراحة بديت كنبغيك من نهار تلاقيتك دك نهار في مدينة معندي مدنير كنكره هاكا مباغيش نتصاحب باغي نبقا طنروكيل، أصلا ماشي عيب تبغي شي حد يك المهم لحاجة لباغي دجا قلته لك نبقاو ديما على تواصل واخة تكوني نتي مباغيانيش ، انبغيك بحال ختي أو نتي بغيني بحال خوك (كنحس بلي أنا درامي ناري مهم فهمي شنو بغيت نوصل لك اوصفي ) .";
             let i = 0;
             const container = document.getElementById('typewriter');
-            function type() { if (i < msg.length) { container.innerHTML += msg.charAt(i); i++; setTimeout(type, 35); } else document.getElementById('portal-container').style.display = 'flex'; }
+            function type() {
+                if (i < msg.length) { container.innerHTML += msg.charAt(i); i++; setTimeout(type, 35); }
+                else document.getElementById('portal-container').style.display = 'flex';
+            }
             type();
         }
-        window.launchSpaceMission = () => { isTraveling = true; clock.start(); document.getElementById('bgMusic').play(); document.getElementById('ui-wrapper').style.opacity = '0'; setTimeout(() => { document.getElementById('ui-wrapper').style.display = 'none'; }, 1000); }
+
+        window.launchSpaceMission = () => {
+            isTraveling = true;
+            clock.start();
+            document.getElementById('bgMusic').play();
+            document.getElementById('ui-wrapper').style.opacity = '0';
+            setTimeout(() => { document.getElementById('ui-wrapper').style.display = 'none'; }, 1000);
+        }
+
+        function endAll() {
+            isTraveling = false;
+            camera.position.set(0, 0, 2000);
+            document.getElementById('final-text').style.display = 'flex';
+        }
+
         init();
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
 </body>
 </html>
