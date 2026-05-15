@@ -19,6 +19,23 @@
             background: rgba(10, 5, 20, 0.85); backdrop-filter: blur(20px);
             border: 2px solid #8a2be2; padding: 25px; border-radius: 25px; 
             text-align: center; width: 85%; max-width: 450px; box-shadow: 0 0 50px rgba(138, 43, 226, 0.5);
+            transition: transform 0.3s ease;
+        }
+
+        /* تنسيق خاص بخدعة تشتت الكلمات */
+        .glitch-text-container {
+            display: inline-block;
+            position: relative;
+            font-size: 18px;
+            line-height: 1.6;
+            color: #ffcccc;
+            text-align: left;
+            direction: ltr;
+        }
+        .glitch-word {
+            display: inline-block;
+            transition: all 1s ease-in-out;
+            position: relative;
         }
 
         #typewriter { font-size: 19px; line-height: 1.7; color: #fff; min-height: 100px; text-align: right; direction: rtl; }
@@ -56,7 +73,15 @@
     </audio>
 
     <div id="ui-wrapper">
-        <div class="glass-card" id="scr1">
+        <div class="glass-card" id="scr0">
+            <div class="glitch-text-container" id="glitchContent">
+                I feel deeply saddened by what I saw today during PE class, because I do not receive even a fraction of what I do for you. Yet, you choose someone else and treat them so well, while showing me only a cold, arrogant face ( حزنننن هيهيي 🤦🏼‍♂️)
+            </div>
+            <br>
+            <button class="btn" onclick="next(0,1)">Continue</button>
+        </div>
+
+        <div class="glass-card" id="scr1" style="display:none">
             <h1 style="font-size: 35px;">Welcome Samia</h1>
             <p>Welcome to a world of my creation</p>
             <button class="btn" onclick="next(1,2)">Enter</button>
@@ -88,15 +113,33 @@
         let scene, camera, renderer, starSystem, wormholeMesh, galaxyMesh;
         let isTraveling = false, clock = new THREE.Clock();
 
+        // كود خدعة تشتيت الكلمات بعد 10 ثوانٍ تلقائياً
+        function setupGlitchEffect() {
+            const container = document.getElementById('glitchContent');
+            const words = container.innerText.split(' ');
+            container.innerHTML = words.map(w => `<span class="glitch-word">${w}</span>`).join(' ');
+
+            setTimeout(() => {
+                const spans = container.querySelectorAll('.glitch-word');
+                spans.forEach(span => {
+                    const randomX = Math.floor(Math.random() * 300) - 150;
+                    const randomY = Math.floor(Math.random() * 300) - 150;
+                    const randomRot = Math.floor(Math.random() * 360);
+                    span.style.transform = `translate(${randomX}px, ${randomY}px) rotate(${randomRot}deg)`;
+                    span.style.opacity = Math.random() * 0.5 + 0.2;
+                    span.style.color = '#ff4d4d'; // يتغير اللون للأحمر دليلاً على الحزن
+                });
+            }, 10000); // 10000 مللي ثانية تساوي 10 ثوانٍ بالضبط
+        }
+
         function init() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 30000);
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio); // ضبط الجودة للهاتف
+            renderer.setPixelRatio(window.devicePixelRatio);
             document.body.appendChild(renderer.domElement);
 
-            // زيادة عدد النجوم (150,000) ولمعانها
             const geo = new THREE.BufferGeometry();
             const pos = [];
             for(let i=0; i<150000; i++) pos.push(THREE.MathUtils.randFloatSpread(15000), THREE.MathUtils.randFloatSpread(15000), THREE.MathUtils.randFloatSpread(10000));
@@ -105,7 +148,7 @@
                 color: 0x8a2be2, 
                 size: 2.2, 
                 transparent: true,
-                blending: THREE.AdditiveBlending // يجعل النجوم أكثر لمعاناً
+                blending: THREE.AdditiveBlending 
             }));
             scene.add(starSystem);
 
@@ -121,6 +164,7 @@
             scene.add(galaxyMesh);
 
             camera.position.z = 2000;
+            setupGlitchEffect(); // تفعيل خدعة تشتيت الكلمات فور البدء
             animate();
         }
 
@@ -178,7 +222,7 @@
         window.launchSpaceMission = () => {
             isTraveling = true;
             clock.start();
-            document.getElementById('bgMusic').play(); // تشغيل الموسيقى عند البدء
+            document.getElementById('bgMusic').play();
             document.getElementById('ui-wrapper').style.opacity = '0';
             setTimeout(() => { document.getElementById('ui-wrapper').style.display = 'none'; }, 1000);
         }
