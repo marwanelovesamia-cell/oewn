@@ -22,6 +22,23 @@
             transition: transform 0.3s ease;
         }
 
+        /* تنسيق العنوان والنص ليكون صغيراً ومنعزلاً */
+        .custom-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffcccc;
+            margin-bottom: 15px;
+            text-align: right;
+            direction: rtl;
+        }
+        .custom-text-small {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #e0e0e0;
+            text-align: right;
+            direction: rtl;
+        }
+
         /* تنسيق خاص بخدعة تشتت الكلمات */
         .glitch-text-container {
             display: inline-block;
@@ -74,11 +91,19 @@
 
     <div id="ui-wrapper">
         <div class="glass-card" id="scr0">
+            <div class="custom-title">حتا رجال تبكي بسبب فقد شخص يحبونه أو ضغوط نفسية</div>
+            <div class="custom-text-small">
+                هادي ثالت ليلة كنبكي على شي حد أول ليلة ماما ثاني ليلة جداتي ماتت نهار وطني ديل تاسعة سبحان الله اي حاجة كتوقع ليا كتوقع في نهار ليكون خيب أو ليلة ٣ هد ليلة بسبب مغنبقاش نشوف بنت لكنبغي أو صحابي أو مكنتش غنكون هك كون كان شي دعم نفسي في دار ولكن خاوية كيف ديما كون كانو كنت انكون مرتاح أو بسبب امتحان حت باقي ناقص شوي مهم عارفو شعور مؤقت ولكن صعيب كتبت هادشي هنا حت معرفتش لمن نقولو نتي دبا مشغولة الله يوفقك
+            </div>
+            <button class="btn" onclick="next(0, 'glitch')">أستمر</button>
+        </div>
+
+        <div class="glass-card" id="scrglitch" style="display:none">
             <div class="glitch-text-container" id="glitchContent">
                 I feel deeply saddened by what I saw today during PE class, because I do not receive even a fraction of what I do for you. Yet, you choose someone else and treat them so well, while showing me only a cold, arrogant face   مثلااااا نحس بغيتيني كفاش معاه كضحكي  او حد شي مع باركة شفتك الى اسمية دبا ؟)
             </div>
             <br>
-            <button class="btn" onclick="next(0,1)">Continue</button>
+            <button class="btn" onclick="next('glitch', 1)">Continue</button>
         </div>
 
         <div class="glass-card" id="scr1" style="display:none">
@@ -113,7 +138,6 @@
         let scene, camera, renderer, starSystem, wormholeMesh, galaxyMesh;
         let isTraveling = false, clock = new THREE.Clock();
 
-        // كود خدعة تشتيت الكلمات بعد 10 ثوانٍ تلقائياً
         function setupGlitchEffect() {
             const container = document.getElementById('glitchContent');
             const words = container.innerText.split(' ');
@@ -127,9 +151,9 @@
                     const randomRot = Math.floor(Math.random() * 360);
                     span.style.transform = `translate(${randomX}px, ${randomY}px) rotate(${randomRot}deg)`;
                     span.style.opacity = Math.random() * 0.5 + 0.2;
-                    span.style.color = '#ff4d4d'; // يتغير اللون للأحمر دليلاً على الحزن
+                    span.style.color = '#ff4d4d';
                 });
-            }, 10000); // 10000 مللي ثانية تساوي 10 ثوانٍ بالضبط
+            }, 10000);
         }
 
         function init() {
@@ -164,7 +188,7 @@
             scene.add(galaxyMesh);
 
             camera.position.z = 2000;
-            setupGlitchEffect(); // تفعيل خدعة تشتيت الكلمات فور البدء
+            setupGlitchEffect();
             animate();
         }
 
