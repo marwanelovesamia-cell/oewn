@@ -155,6 +155,11 @@
             font-size: 35px; font-weight: bold; pointer-events: none;
             text-shadow: 0 0 30px #8a2be2, 0 0 50px #fff; padding: 20px;
         }
+
+        /* تنسيق نص الانتظار التوضيحي */
+        .wait-text {
+            font-size: 14px; color: #ff4d4d; margin-top: 15px; font-family: 'Cairo', sans-serif; text-shadow: 0 0 5px rgba(255,0,0,0.3);
+        }
     </style>
 </head>
 <body>
@@ -209,9 +214,11 @@
         </div>
 
         <div class="glass-card" id="scrglitch" style="display:none">
-            <div class="glitch-text-container" id="glitchContent">I feel deeply saddened by what I saw today during PE class, because I do not receive even a fraction of what I do for you. Yet, you choose someone else and treat them so well, while showing me only a cold, arrogant face.  بغيتني نحس  صعيبىبة كفاش معاه كضحكي او حد شي مع باركة شفتك الى اسمية دبا ؟</div>
+            <div class="glitch-text-container" id="glitchContent">I feel deeply saddened by what I saw today during PE class, because I do not receive even a fraction of what I do for you. Yet, you choose someone else and treat them so well, while showing me only a cold, arrogant face.  صعيييبة نحس بغيتيني كفاش معاه كضحكي او حد شي مع باركة شفتك الى اسمية دبا ؟ </div>
+            
+            <div id="glitchWaitMsg" class="wait-text">انتظري 30 ثانية لاتمام مرحلة...</div>
             <br>
-            <button class="btn" onclick="next('glitch', 1)">Continue</button>
+            <button class="btn" id="glitchContinueBtn" onclick="next('glitch', 1)" style="display: none;">Continue</button>
         </div>
 
         <div class="glass-card" id="scr1" style="display:none">
@@ -220,7 +227,7 @@
             <button class="btn" onclick="next(1,2)">Enter</button>
         </div>
         <div class="glass-card" id="scr2" style="display:none">
-            <p>مرحباً، هذا صنع في اليوم 2026.4.12... مصنوع بيد شخص رخص وقته ليعبر لكِ عما في راسو او قلبو (خدا مني هد كود سمانة بمعنى 5دقيق في نهار متخيليش انني كنسهر مثلا باش نصوبو  معقد هدشي عدبني عرفتي شحال ديال كتبة ولكن هانية اصلا ندير لك اي حاجة ماشي مهم  هه).</p>
+            <p>مرحباً، هذا صنع في اليوم 2026.4.12... مصنوع بيد شخص رخص وقته ليعبر لكِ عما في راسو او قلبو (خدا مني هد كود سمانة بمعنى 5دقيق في نهار متخيليش انني كنسهر مثلا باش نصوبو  معقد هدشي عدبني عرفتي شحال ديال كتبة ولكن هانية اصلا ندير لك اي حاجة ماشي مهم كنتمنى تقدري مجهود لكندير على قبلك حت والله كنبغيك بزاف ).</p>
             <button class="btn" onclick="next(2,3)">التالي</button>
         </div>
         <div class="glass-card" id="scr3" style="display:none">
@@ -357,8 +364,10 @@
                 return `<span class="glitch-word">${w}</span>`;
             }).join('');
 
+            const spans = container.querySelectorAll('.glitch-word');
+
+            // 1. تفعيل البعثرة بعد مرور 30 ثانية تماماً
             setTimeout(() => {
-                const spans = container.querySelectorAll('.glitch-word');
                 spans.forEach(span => {
                     const randomX = Math.floor(Math.random() * 400) - 200;
                     const randomY = Math.floor(Math.random() * 400) - 200;
@@ -371,7 +380,23 @@
                     span.style.color = '#ff4d4d';
                     span.style.textShadow = '0 0 10px #ff0000';
                 });
-            }, 20000); 
+
+                // 2. بعد انتهاء البعثرة (مثلا بـ 4 ثوانٍ)، يعود النص طبيعياً ويظهر زر المتابعة
+                setTimeout(() => {
+                    spans.forEach(span => {
+                        span.style.transform = 'none';
+                        span.style.opacity = '1';
+                        span.style.color = '#ffcccc';
+                        span.style.textShadow = 'none';
+                    });
+                    
+                    // إخفاء رسالة الانتظار وإظهار زر Continue للاستمرار
+                    document.getElementById('glitchWaitMsg').style.display = 'none';
+                    document.getElementById('glitchContinueBtn').style.display = 'inline-block';
+
+                }, 4000); // مدة البعثرة قبل العودة للحالة الطبيعية
+
+            }, 30000); // 30 ثانية انتظار قبل حدوث البعثرة
         }
 
         function playClockTick() {
@@ -487,7 +512,6 @@
             scene.add(galaxyMesh);
 
             camera.position.z = 2000;
-            setupGlitchEffect();
             animate();
         }
 
@@ -528,6 +552,10 @@
         window.next = (oldS, newS) => {
             document.getElementById(`scr${oldS}`).style.display = 'none';
             document.getElementById(`scr${newS}`).style.display = 'block';
+            
+            if(newS === 'glitch') {
+                setupGlitchEffect();
+            }
             if(newS === 4) typeText();
         }
 
