@@ -9,160 +9,132 @@
         
         body { margin: 0; background: #020204; overflow: hidden; font-family: 'Cairo', sans-serif; color: white; touch-action: manipulation; }
         
-        /* كافاناس الخلفية الرسومية للشاشة الأولى */
-        #introCanvas {
-            position: fixed; inset: 0; width: 100%; height: 100%; z-index: 5; background: #050508;
-            transition: opacity 1s ease;
-        }
-
-        /* الشاشة الافتتاحية الأولى (النص والقلب الأبيض والعداد) */
-        #intro-layer-wrapper {
-            position: fixed; inset: 0; z-index: 10;
+        /* --- واجهة القفل والمطر الرقمي المؤقتة --- */
+        #lock-screen-wrapper {
+            position: fixed; inset: 0; z-index: 9999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            gap: 30px; padding: 20px; box-sizing: border-box;
+            gap: 20px; padding: 25px; box-sizing: border-box; background: transparent;
             transition: opacity 1s ease, transform 1s ease;
         }
+        #matrixCanvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 9998; background: #02010a; transition: opacity 1s ease; }
+        
+        .lock-message {
+            font-size: 22px; font-weight: 700; color: #ffffff; text-align: center; 
+            direction: rtl; margin: 0; text-shadow: 0 4px 25px rgba(0, 0, 0, 0.9); line-height: 1.6; max-width: 550px;
+        }
+        .instruction-text {
+            font-size: 16px; font-weight: 400; color: #ccb3ff; text-align: center;
+            direction: rtl; margin: 0; text-shadow: 0 2px 15px rgba(138, 43, 226, 0.4); max-width: 500px; line-height: 1.5;
+        }
+        .pin-container {
+            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 25px; margin-top: 15px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7); display: flex; flex-direction: column; align-items: center; gap: 15px;
+        }
+        .pin-display { display: flex; gap: 12px; margin-bottom: 5px; }
+        .pin-dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); background: transparent; transition: background 0.2s; }
+        .pin-dot.active { background: #8a2be2; border-color: #8a2be2; box-shadow: 0 0 10px #8a2be2; }
+        .pin-dot.error { background: #ff4d4d; border-color: #ff4d4d; box-shadow: 0 0 10px #ff4d4d; }
+        .pin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .pin-btn {
+            width: 60px; height: 60px; border-radius: 50%; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff; font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 400;
+            display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.2s;
+            user-select: none; -webkit-user-select: none;
+        }
+        .pin-btn:active { background: rgba(138, 43, 226, 0.3); border-color: #8a2be2; transform: scale(0.92); }
 
-        /* تنسيق القلب الأبيض النابض الفخم */
+        /* --- تصميم كودك الأساسي الأصلي --- */
+        #introCanvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 5; background: #050508; transition: opacity 1s ease; }
+        #intro-layer-wrapper {
+            position: fixed; inset: 0; z-index: 10; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            gap: 30px; padding: 20px; box-sizing: border-box; transition: opacity 1s ease, transform 1s ease;
+        }
         .mini-heart {
             width: 20px; height: 20px; background-color: #ffffff; position: relative;
             transform: rotate(-45deg); animation: heartBeat 1.4s infinite ease-in-out;
-            box-shadow: 0 0 35px rgba(255, 255, 255, 1);
-            margin-bottom: 5px;
+            box-shadow: 0 0 35px rgba(255, 255, 255, 1); margin-bottom: 5px;
         }
-        .mini-heart::before, .mini-heart::after {
-            content: ""; width: 20px; height: 20px; background-color: #ffffff; border-radius: 50%; position: absolute;
-        }
+        .mini-heart::before, .mini-heart::after { content: ""; width: 20px; height: 20px; background-color: #ffffff; border-radius: 50%; position: absolute; }
         .mini-heart::before { top: -10px; left: 0; }
         .mini-heart::after { left: 10px; top: 0; }
-        @keyframes heartBeat {
-            0%, 100% { transform: scale(1) rotate(-45deg); }
-            50% { transform: scale(1.2) rotate(-45deg); filter: brightness(1.4); }
-        }
+        @keyframes heartBeat { 0%, 100% { transform: scale(1) rotate(-45deg); } 50% { transform: scale(1.2) rotate(-45deg); filter: brightness(1.4); } }
 
-        /* تنسيق النص الإنجليزي */
         .graphic-text {
-            font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 200;
-            letter-spacing: 7px; color: #ffffff; line-height: 1.8; text-align: center;
+            font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 200; letter-spacing: 7px; color: #ffffff; line-height: 1.8; text-align: center;
             text-shadow: 0 4px 20px rgba(0, 0, 0, 0.9); margin: 0;
         }
         .bold-line { font-weight: 700; display: block; letter-spacing: 9px; margin-top: 8px; color: rgba(255,255,255,0.95); }
 
-        /* التصميم الخارق والفاخر للساعة الرقمية النيون */
-        .beautiful-clock-wrapper {
-            display: flex; align-items: center; gap: 12px; margin-top: 15px;
-        }
+        .beautiful-clock-wrapper { display: flex; align-items: center; gap: 12px; margin-top: 15px; }
         .clock-box {
-            background: rgba(15, 15, 25, 0.65);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(138, 43, 226, 0.35);
-            border-radius: 16px;
-            padding: 14px 16px;
-            min-width: 65px;
-            text-align: center;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8), inset 0 1px 2px rgba(255,255,255,0.15), 0 0 15px rgba(138, 43, 226, 0.1);
-            transition: all 0.3s ease;
+            background: rgba(15, 15, 25, 0.65); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(138, 43, 226, 0.35); border-radius: 16px; padding: 14px 16px; min-width: 65px; text-align: center;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8), inset 0 1px 2px rgba(255,255,255,0.15), 0 0 15px rgba(138, 43, 226, 0.1); transition: all 0.3s ease;
         }
-        .clock-num {
-            font-family: 'Montserrat', sans-serif; font-size: 38px; font-weight: 400;
-            color: #ffffff; letter-spacing: 0px; line-height: 1;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.85), 0 0 30px rgba(138, 43, 226, 0.3);
-        }
-        .clock-label {
-            font-size: 9px; color: #8a2be2; 
-            text-transform: uppercase; letter-spacing: 2px; margin-top: 8px;
-            font-family: 'Montserrat', sans-serif; font-weight: 700;
-            text-shadow: 0 0 5px rgba(138, 43, 226, 0.5);
-        }
-        .clock-colon {
-            font-family: 'Montserrat', sans-serif; font-size: 32px; font-weight: 200;
-            color: rgba(138, 43, 226, 0.6); animation: blink 1s infinite;
-            text-shadow: 0 0 15px rgba(138, 43, 226, 0.4);
-            padding-bottom: 22px;
-        }
+        .clock-num { font-family: 'Montserrat', sans-serif; font-size: 38px; font-weight: 400; color: #ffffff; line-height: 1; text-shadow: 0 0 20px rgba(255, 255, 255, 0.85), 0 0 30px rgba(138, 43, 226, 0.3); }
+        .clock-label { font-size: 9px; color: #8a2be2; text-transform: uppercase; letter-spacing: 2px; margin-top: 8px; font-family: 'Montserrat', sans-serif; font-weight: 700; text-shadow: 0 0 5px rgba(138, 43, 226, 0.5); }
+        .clock-colon { font-family: 'Montserrat', sans-serif; font-size: 32px; font-weight: 200; color: rgba(138, 43, 226, 0.6); animation: blink 1s infinite; text-shadow: 0 0 15px rgba(138, 43, 226, 0.4); padding-bottom: 22px; }
         @keyframes blink { 50% { opacity: 0.1; } 0%, 100% { opacity: 1; } }
 
-        /* تنسيق النص المكتوب أسفل الساعة */
         .countdown-subtext {
-            font-family: 'Cairo', sans-serif; font-size: 14px; color: rgba(255, 255, 255, 0.75);
-            text-align: center; margin-top: 5px; direction: rtl;
-            letter-spacing: 0.5px; background: rgba(138, 43, 226, 0.05);
-            padding: 8px 28px; border-radius: 30px; border: 1px solid rgba(138, 43, 226, 0.2);
-            text-shadow: 0 2px 12px rgba(0,0,0,0.7);
+            font-family: 'Cairo', sans-serif; font-size: 14px; color: rgba(255, 255, 255, 0.75); text-align: center; margin-top: 5px; direction: rtl;
+            letter-spacing: 0.5px; background: rgba(138, 43, 226, 0.05); padding: 8px 28px; border-radius: 30px; border: 1px solid rgba(138, 43, 226, 0.2); text-shadow: 0 2px 12px rgba(0,0,0,0.7);
         }
 
         .respond-btn {
-            background: transparent; border: 1px solid rgba(255, 255, 255, 0.2); color: #f4f4f6;
-            padding: 16px 50px; font-size: 11px; letter-spacing: 7px; text-transform: uppercase;
-            cursor: pointer; box-shadow: 0 4px 30px rgba(0,0,0,0.6); font-family: 'Montserrat', sans-serif;
-            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); margin-top: 15px; border-radius: 30px;
+            background: transparent; border: 1px solid rgba(255, 255, 255, 0.2); color: #f4f4f6; padding: 16px 50px; font-size: 11px; letter-spacing: 7px; text-transform: uppercase;
+            cursor: pointer; box-shadow: 0 4px 30px rgba(0,0,0,0.6); font-family: 'Montserrat', sans-serif; transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); margin-top: 15px; border-radius: 30px;
         }
-        .respond-btn:hover {
-            background: #ffffff; color: #020204; border-color: #ffffff;
-            box-shadow: 0 0 45px rgba(255, 255, 255, 0.4); letter-spacing: 9px;
-        }
+        .respond-btn:hover { background: #ffffff; color: #020204; border-color: #ffffff; box-shadow: 0 0 45px rgba(255, 255, 255, 0.4); letter-spacing: 9px; }
 
-        /* الكانفاس الخاص بكودك الثاني ثلاثي الأبعاد */
         #threeCanvas { position: fixed; inset: 0; z-index: 1; }
-
-        /* حاوية عناصر الكود الثاني الخاص بك */
-        #ui-wrapper {
-            position: fixed; inset: 0; z-index: 100;
-            display: none; flex-direction: column; justify-content: center; align-items: center;
-            padding: 15px; opacity: 0; transition: opacity 1s ease;
-        }
-
-        .glass-card {
-            background: rgba(10, 5, 20, 0.85); backdrop-filter: blur(20px);
-            border: 2px solid #8a2be2; padding: 25px; border-radius: 25px; 
-            text-align: center; width: 85%; max-width: 450px; box-shadow: 0 0 50px rgba(138, 43, 226, 0.5);
-        }
-
+        #ui-wrapper { position: fixed; inset: 0; z-index: 100; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 15px; opacity: 0; transition: opacity 1s ease; }
+        .glass-card { background: rgba(10, 5, 20, 0.85); backdrop-filter: blur(20px); border: 2px solid #8a2be2; padding: 25px; border-radius: 25px; text-align: center; width: 85%; max-width: 450px; box-shadow: 0 0 50px rgba(138, 43, 226, 0.5); }
         .custom-title { font-size: 18px; font-weight: bold; color: #ffcccc; margin-bottom: 15px; text-align: right; direction: rtl; }
         .custom-text-small { font-size: 14px; line-height: 1.6; color: #e0e0e0; text-align: right; direction: rtl; }
         
-        /* حاوية تشتت الكلمات */
-        .glitch-text-container { 
-            display: block; position: relative; font-size: 16px; line-height: 1.6; 
-            color: #ffcccc; text-align: center; direction: ltr; perspective: 1000px;
-        }
-        .glitch-word { 
-            display: inline-block; transition: all 1.5s cubic-bezier(0.25, 1, 0.5, 1); 
-            position: relative; white-space: pre;
-        }
-        
+        .glitch-text-container { display: block; position: relative; font-size: 16px; line-height: 1.6; color: #ffcccc; text-align: center; direction: ltr; perspective: 1000px; }
+        .glitch-word { display: inline-block; transition: all 1.5s cubic-bezier(0.25, 1, 0.5, 1); position: relative; white-space: pre; }
         #typewriter { font-size: 19px; line-height: 1.7; color: #fff; min-height: 100px; text-align: right; direction: rtl; }
 
-        .btn {
-            background: none; border: 1px solid #fff; color: #fff;
-            padding: 10px 35px; border-radius: 50px; cursor: pointer;
-            font-size: 17px; margin-top: 20px; transition: 0.5s;
-        }
+        .btn { background: none; border: 1px solid #fff; color: #fff; padding: 10px 35px; border-radius: 50px; cursor: pointer; font-size: 17px; margin-top: 20px; transition: 0.5s; }
         .btn:hover { background: #fff; color: #000; box-shadow: 0 0 30px #fff; }
 
         #portal-container { display: none; flex-direction: column; align-items: center; cursor: pointer; margin-top: 30px; }
-        .wormhole-core {
-            width: 100px; height: 100px; background: #000; border-radius: 50%;
-            box-shadow: 0 0 60px #8a2be2, inset 0 0 40px #000, 0 0 100px #fff;
-            position: relative; animation: pulse 2s infinite ease-in-out;
-        }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-
-        #final-text {
-            position: fixed; inset: 0; z-index: 200; display: none;
-            justify-content: center; align-items: center; text-align: center;
-            font-size: 35px; font-weight: bold; pointer-events: none;
-            text-shadow: 0 0 30px #8a2be2, 0 0 50px #fff; padding: 20px;
-        }
-
-        /* تنسيق نص الانتظار التوضيحي */
-        .wait-text {
-            font-size: 14px; color: #ff4d4d; margin-top: 15px; font-family: 'Cairo', sans-serif; text-shadow: 0 0 5px rgba(255,0,0,0.3);
-        }
+        .wormhole-core { width: 100px; height: 100px; background: #000; border-radius: 50%; box-shadow: 0 0 60px #8a2be2, inset 0 0 40px #000, 0 0 100px #fff; position: relative; animation: pulse 2s infinite ease-in-out; }
+        
+        #final-text { position: fixed; inset: 0; z-index: 200; display: none; justify-content: center; align-items: center; text-align: center; font-size: 35px; font-weight: bold; pointer-events: none; text-shadow: 0 0 30px #8a2be2, 0 0 50px #fff; padding: 20px; }
+        .wait-text { font-size: 14px; color: #ff4d4d; margin-top: 15px; font-family: 'Cairo', sans-serif; text-shadow: 0 0 5px rgba(255,0,0,0.3); }
     </style>
 </head>
 <body>
+
+    <canvas id="matrixCanvas"></canvas>
+    <div id="lock-screen-wrapper">
+        <h1 class="lock-message">لن يفتح هذا ولن ترين شيئاً إلا بعد فتحه من صاحب الكود يا بنت...</h1>
+        <p class="instruction-text">تسناي من بعد او نوريك كلمة سر باش تشوفي شنو صيبت</p>
+        
+        <div class="pin-container">
+            <div class="pin-display" id="pinDisplay">
+                <div class="pin-dot"></div>
+                <div class="pin-dot"></div>
+                <div class="pin-dot"></div>
+                <div class="pin-dot"></div>
+            </div>
+            <div class="pin-grid">
+                <div class="pin-btn" onclick="pressPin(1)">1</div>
+                <div class="pin-btn" onclick="pressPin(2)">2</div>
+                <div class="pin-btn" onclick="pressPin(3)">3</div>
+                <div class="pin-btn" onclick="pressPin(4)">4</div>
+                <div class="pin-btn" onclick="pressPin(5)">5</div>
+                <div class="pin-btn" onclick="pressPin(6)">6</div>
+                <div class="pin-btn" onclick="pressPin(7)">7</div>
+                <div class="pin-btn" onclick="pressPin(8)">8</div>
+                <div class="pin-btn" onclick="pressPin(9)">9</div>
+            </div>
+        </div>
+    </div>
 
     <audio id="bgMusic" loop>
         <source src="https://assets.mixkit.co/music/preview/mixkit-deep-space-966.mp3" type="audio/mpeg">
@@ -178,29 +150,16 @@
         </p>
         
         <div class="beautiful-clock-wrapper">
-            <div class="clock-box">
-                <div class="clock-num" id="daysBox">22</div>
-                <div class="clock-label">Days</div>
-            </div>
+            <div class="clock-box"><div class="clock-num" id="daysBox">22</div><div class="clock-label">Days</div></div>
             <div class="clock-colon">:</div>
-            <div class="clock-box">
-                <div class="clock-num" id="hoursBox">00</div>
-                <div class="clock-label">Hours</div>
-            </div>
+            <div class="clock-box"><div class="clock-num" id="hoursBox">00</div><div class="clock-label">Hours</div></div>
             <div class="clock-colon">:</div>
-            <div class="clock-box">
-                <div class="clock-num" id="minutesBox">00</div>
-                <div class="clock-label">Mins</div>
-            </div>
+            <div class="clock-box"><div class="clock-num" id="minutesBox">00</div><div class="clock-label">Mins</div></div>
             <div class="clock-colon">:</div>
-            <div class="clock-box">
-                <div class="clock-num" id="secondsBox">00</div>
-                <div class="clock-label">Secs</div>
-            </div>
+            <div class="clock-box"><div class="clock-num" id="secondsBox">00</div><div class="clock-label">Secs</div></div>
         </div>
         
         <div class="countdown-subtext">الان حتا دلك الحين سنتواصل مدى الحياة 😊</div>
-
         <button class="respond-btn" onclick="startYourCodeSequence()">Respond</button>
     </div>
 
@@ -208,14 +167,13 @@
         <div class="glass-card" id="scr0">
             <div class="custom-title">حتا رجال تبكي بسبب فقد شخص يحبونه أو ضغوط نفسية يعني ماشي لبكيت راه مشي راجل انا رجل </div>
             <div class="custom-text-small">
-                هادي ثالت ليلة كنبكي على شي حد أول ليلة ماما ثاني ليلة جداتي ماتت نهار وطني ديل تاسعة سبحان الله اي حاجة كتوقع ليا كتوقع في نهار ليكون خيب أو ليلة ٣ هد ليلة بسبب مغنبقاش نشوف بنت لكنبغي أو صحابي أو مكنتش غنكون هك كون كان شي دعم نفسي في دار ولكن خاوية كيف ديما كون كانو كنت انكون مرتاح او فيا سخانة   مهم عارفو شعور مؤقت ولكن صعيب حتش ديجا بوحدي أو فاقد بزاف ناس كانو عزاز أو حسيت تاني هك معك مهم فرحان بعدا حت انبقاو على تواصل ديما...  كتبت هادشي هنا حت معرفتش لمن نقولو نتي دبا مشغولة الله يوفقك
+                هادي ثالت ليلة كنبكي على شي حد أول ليلة ماما ثاني ليلة جداتي ماتت نهار وطني ديل تاسعة سبحان الله اي حاجة كتوقع ليا كتوقع في نهار ليكون خيب أو ليلة ٣ هد ليلة بسبب مغنبقاش نشوف بنت لكنبغي أو صحابي أو مكنتش غنكون هك كون كان شي دعم نفسي في دار ولكن خاوية كيف ديما كون كانو كنت انكون مرتاح او فيا سخانة  مهم عارفو شعور مؤقت ولكن صعيب حتش ديجا بوحدي أو فاقد بزاف ناس كانو عزاز أو حسيت تاني هك معك مهم فرحان بعدا حت انبقاو على تواصل ديما...  كتبت هادشي هنا حت معرفتش لمن نقولو نتي دبا مشغولة الله يوفقك
             </div>
             <button class="btn" onclick="next(0, 'glitch')">أستمر</button>
         </div>
 
         <div class="glass-card" id="scrglitch" style="display:none">
             <div class="glitch-text-container" id="glitchContent">I feel deeply saddened by what I saw today during PE class, because I do not receive even a fraction of what I do for you. Yet, you choose someone else and treat them so well, while showing me only a cold, arrogant face.  صعيييبة نحس بغيتيني كفاش معاه كضحكي او حد شي مع باركة شفتك الى اسمية دبا ؟ </div>
-            
             <div id="glitchWaitMsg" class="wait-text">انتظري 30 ثانية لاتمام مرحلة...</div>
             <br>
             <button class="btn" id="glitchContinueBtn" onclick="next('glitch', 1)" style="display: none;">Continue</button>
@@ -246,6 +204,74 @@
     <div id="final-text">That’s all there is, my dear.</div>
 
     <script>
+        // نظام إدخال وفحص كلمة السر لمنع الدخول العشوائي
+        const CORRECT_PIN = "1234"; // يمكنك تغيير الرمز السري من هنا (من 1 إلى 9)
+        let currentInput = "";
+        const dots = document.querySelectorAll('.pin-dot');
+
+        function pressPin(num) {
+            if (currentInput.length < 4) {
+                currentInput += num;
+                dots[currentInput.length - 1].classList.add('active');
+                
+                if (currentInput.length === 4) {
+                    setTimeout(checkPin, 250);
+                }
+            }
+        }
+
+        function checkPin() {
+            if (currentInput === CORRECT_PIN) {
+                // فتح نظام الحماية واختفاء شاشة الحجب بالكامل لتظهر صفحتك الأساسية
+                document.getElementById('lock-screen-wrapper').style.opacity = '0';
+                document.getElementById('lock-screen-wrapper').style.transform = 'scale(0.95)';
+                document.getElementById('matrixCanvas').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('lock-screen-wrapper').style.display = 'none';
+                    document.getElementById('matrixCanvas').style.display = 'none';
+                    // تشغيل الأنيميشن الخلفي الخاص بكودك فوراً بعد الفتح
+                    drawIntroBackground();
+                }, 1000);
+            } else {
+                // تظليل النقاط باللون الأحمر دلالة على الخطأ وإعادة المحاولة
+                dots.forEach(dot => { dot.classList.remove('active'); dot.classList.add('error'); });
+                setTimeout(() => {
+                    dots.forEach(dot => { dot.classList.remove('error'); });
+                    currentInput = "";
+                }, 600);
+            }
+        }
+
+        // غرافيك المطر الرقمي المخصص لواجهة الحجب
+        const mCanvas = document.getElementById('matrixCanvas');
+        const mCtx = mCanvas.getContext('2d');
+        function resizeMatrix() { mCanvas.width = window.innerWidth; mCanvas.height = window.innerHeight; }
+        resizeMatrix();
+        window.addEventListener('resize', resizeMatrix);
+
+        const mFontSize = 14;
+        const mColumns = Math.floor(mCanvas.width / mFontSize) + 1;
+        const mDrops = Array(mColumns).fill(1);
+        const mChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ⏳🔒";
+
+        function drawMatrix() {
+            mCtx.fillStyle = 'rgba(2, 1, 10, 0.08)';
+            mCtx.fillRect(0, 0, mCanvas.width, mCanvas.height);
+            for (let i = 0; i < mDrops.length; i++) {
+                const text = mChars[Math.floor(Math.random() * mChars.length)];
+                if (i % 3 === 0) mCtx.fillStyle = 'rgba(138, 43, 226, 0.25)';
+                else if (i % 3 === 1) mCtx.fillStyle = 'rgba(30, 144, 255, 0.2)';
+                else mCtx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+                mCtx.font = mFontSize + 'px Montserrat';
+                mCtx.fillText(text, i * mFontSize, mDrops[i] * mFontSize);
+                if (mDrops[i] * mFontSize > mCanvas.height && Math.random() * 0.985 > 0.975) mDrops[i] = 0;
+                mDrops[i]++;
+            }
+            if (mCanvas.style.display !== 'none') requestAnimationFrame(drawMatrix);
+        }
+        drawMatrix();
+
+        // سكريبت الخلفية الرسومية لشاشتك الافتتاحية الأساسية
         const introCanvas = document.getElementById('introCanvas');
         const introCtx = introCanvas.getContext('2d');
         introCanvas.width = window.innerWidth;
@@ -253,45 +279,33 @@
 
         let introTick = 0;
         const introMouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-
-        window.addEventListener('mousemove', (e) => {
-            introMouse.x = e.clientX;
-            introMouse.y = e.clientY;
-        });
+        window.addEventListener('mousemove', (e) => { introMouse.x = e.clientX; introMouse.y = e.clientY; });
 
         function drawIntroBackground() {
             introCtx.fillStyle = '#050508';
             introCtx.fillRect(0, 0, introCanvas.width, introCanvas.height);
             introTick += 0.004;
-
             let linesCount = 8;
             for (let i = 0; i < linesCount; i++) {
                 introCtx.beginPath();
                 let offset = i * 0.3;
                 introCtx.strokeStyle = `rgba(138, 43, 226, ${0.15 - (i * 0.01)})`;
                 introCtx.lineWidth = 1.2;
-
                 for (let x = 0; x < introCanvas.width; x += 10) {
                     let wave = Math.sin(x * 0.002 + introTick + offset) * 100;
                     let dist = Math.exp(-Math.pow(x - introMouse.x, 2) / (2 * Math.pow(300, 2)));
                     let pull = (introMouse.y - introCanvas.height / 2) * dist * 0.6;
                     let y = introCanvas.height / 2 + wave + pull;
-
                     if (x === 0) introCtx.moveTo(x, y);
                     else introCtx.lineTo(x, y);
                 }
                 introCtx.stroke();
             }
-            if(introCanvas.style.display !== 'none') {
+            if(introCanvas.style.display !== 'none' && document.getElementById('lock-screen-wrapper').style.display === 'none') {
                 requestAnimationFrame(drawIntroBackground);
             }
         }
-        drawIntroBackground();
-
-        window.addEventListener('resize', () => {
-            introCanvas.width = window.innerWidth;
-            introCanvas.height = window.innerHeight;
-        });
+        window.addEventListener('resize', () => { introCanvas.width = window.innerWidth; introCanvas.height = window.innerHeight; });
     </script>
 
     <script type="importmap"> { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } } </script>
@@ -307,16 +321,13 @@
         let spaceOscillator = null;
         let spaceGain = null;
 
-        // ربط عناصر الساعة الرقمية ذات الأربع خانات
         const daysBox = document.getElementById('daysBox');
         const hoursBox = document.getElementById('hoursBox');
         const minutesBox = document.getElementById('minutesBox');
         const secondsBox = document.getElementById('secondsBox');
         
         let endTime = localStorage.getItem('countdownEndTimeV2');
-
         if (!endTime) {
-            // تحديث الحسبة لتصبح 22 يوماً كاملاً (22 يوم * 24 ساعة * 60 دقيقة * 60 ثانية * 1000 مللي ثانية)
             endTime = Date.now() + (22 * 24 * 60 * 60 * 1000);
             localStorage.setItem('countdownEndTimeV2', endTime);
         } else {
@@ -326,33 +337,22 @@
         function updateCountdown() {
             let now = Date.now();
             let timeLeft = endTime - now; 
-
             if (timeLeft <= 0) {
-                daysBox.innerText = "00";
-                hoursBox.innerText = "00";
-                minutesBox.innerText = "00";
-                secondsBox.innerText = "00";
+                daysBox.innerText = "00"; hoursBox.innerText = "00"; minutesBox.innerText = "00"; secondsBox.innerText = "00";
                 return;
             }
-
             let totalSecondsLeft = Math.floor(timeLeft / 1000);
-            
-            // حساب الأيام والساعات والدقائق والثواني بشكل دقيق من الـ 22 يوم المحددة
             let days = Math.floor(totalSecondsLeft / (3600 * 24));
             let hrs = Math.floor((totalSecondsLeft % (3600 * 24)) / 3600);
             let mins = Math.floor((totalSecondsLeft % 3600) / 60);
             let secs = totalSecondsLeft % 60;
 
-            // عرض الأرقام بتنسيق نيون احترافي
             daysBox.innerText = days < 10 ? "0" + days : days;
             hoursBox.innerText = hrs < 10 ? "0" + hrs : hrs;
             minutesBox.innerText = mins < 10 ? "0" + mins : mins;
             secondsBox.innerText = secs < 10 ? "0" + secs : secs;
-
-            // تكتكة الساعة البرمجية
             playClockTick();
         }
-        
         updateCountdown();
         setInterval(updateCountdown, 1000);
 
@@ -365,8 +365,6 @@
             }).join('');
 
             const spans = container.querySelectorAll('.glitch-word');
-
-            // 1. تفعيل البعثرة بعد مرور 30 ثانية تماماً
             setTimeout(() => {
                 spans.forEach(span => {
                     const randomX = Math.floor(Math.random() * 400) - 200;
@@ -374,114 +372,72 @@
                     const randomZ = Math.floor(Math.random() * 500) - 250;
                     const randomRotX = Math.floor(Math.random() * 360);
                     const randomRotY = Math.floor(Math.random() * 360);
-                    
                     span.style.transform = `translate3d(${randomX}px, ${randomY}px, ${randomZ}px) rotateX(${randomRotX}deg) rotateY(${randomRotY}deg)`;
                     span.style.opacity = Math.random() * 0.4 + 0.1;
                     span.style.color = '#ff4d4d';
                     span.style.textShadow = '0 0 10px #ff0000';
                 });
-
-                // 2. بعد انتهاء البعثرة (مثلا بـ 4 ثوانٍ)، يعود النص طبيعياً ويظهر زر المتابعة
                 setTimeout(() => {
-                    spans.forEach(span => {
-                        span.style.transform = 'none';
-                        span.style.opacity = '1';
-                        span.style.color = '#ffcccc';
-                        span.style.textShadow = 'none';
-                    });
-                    
-                    // إخفاء رسالة الانتظار وإظهار زر Continue للاستمرار
+                    spans.forEach(span => { span.style.transform = 'none'; span.style.opacity = '1'; span.style.color = '#ffcccc'; span.style.textShadow = 'none'; });
                     document.getElementById('glitchWaitMsg').style.display = 'none';
                     document.getElementById('glitchContinueBtn').style.display = 'inline-block';
-
-                }, 4000); // مدة البعثرة قبل العودة للحالة الطبيعية
-
-            }, 30000); // 30 ثانية انتظار قبل حدوث البعثرة
+                }, 4000);
+            }, 30000);
         }
 
         function playClockTick() {
             if (!audioCtx) return; 
-            
             let osc = audioCtx.createOscillator();
             let gain = audioCtx.createGain();
-            
             osc.type = 'triangle';
             osc.frequency.setValueAtTime(800, audioCtx.currentTime); 
-            
             gain.gain.setValueAtTime(0.012, audioCtx.currentTime); 
             gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.04); 
-            
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.04);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.04);
         }
 
         function startAmbientPiano() {
             if (audioCtx) return;
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
             pianoInterval = setInterval(() => {
                 if (!audioCtx) return;
                 let scale = [261.63, 329.63, 392.00, 440.00, 523.25]; 
                 let randomNote = scale[Math.floor(Math.random() * scale.length)];
-
                 let osc = audioCtx.createOscillator();
                 let gain = audioCtx.createGain();
-
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(randomNote / 2, audioCtx.currentTime); 
-
+                osc.type = 'sine'; osc.frequency.setValueAtTime(randomNote / 2, audioCtx.currentTime); 
                 gain.gain.setValueAtTime(0.03, audioCtx.currentTime); 
                 gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 5);
-
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-
-                osc.start();
-                osc.stop(audioCtx.currentTime + 5);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + 5);
             }, 3000);
         }
 
-        window.addEventListener('mousemove', () => { if(!audioCtx) startAmbientPiano(); });
-        window.addEventListener('touchstart', () => { if(!audioCtx) startAmbientPiano(); });
+        window.addEventListener('mousemove', () => { if(!audioCtx && document.getElementById('lock-screen-wrapper').style.display === 'none') startAmbientPiano(); });
+        window.addEventListener('touchstart', () => { if(!audioCtx && document.getElementById('lock-screen-wrapper').style.display === 'none') startAmbientPiano(); });
 
         function playDeepSpaceMusic() {
             if (pianoInterval) clearInterval(pianoInterval);
-
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             spaceOscillator = audioCtx.createOscillator();
             spaceGain = audioCtx.createGain();
-
             spaceOscillator.type = 'triangle'; 
             spaceOscillator.frequency.setValueAtTime(110.00, audioCtx.currentTime); 
-
             let lfo = audioCtx.createOscillator();
             let lfoGain = audioCtx.createGain();
-            lfo.type = 'sine';
-            lfo.frequency.setValueAtTime(0.2, audioCtx.currentTime); 
+            lfo.type = 'sine'; lfo.frequency.setValueAtTime(0.2, audioCtx.currentTime); 
             lfoGain.gain.setValueAtTime(1.5, audioCtx.currentTime);
-            
-            lfo.connect(lfoGain);
-            lfoGain.connect(spaceOscillator.frequency);
-
+            lfo.connect(lfoGain); lfoGain.connect(spaceOscillator.frequency);
             spaceGain.gain.setValueAtTime(0.0, audioCtx.currentTime);
             spaceGain.gain.linearRampToValueAtTime(0.06, audioCtx.currentTime + 3); 
-
-            spaceOscillator.connect(spaceGain);
-            spaceGain.connect(audioCtx.destination);
-
-            lfo.start();
-            spaceOscillator.start();
+            spaceOscillator.connect(spaceGain); spaceGain.connect(audioCtx.destination);
+            lfo.start(); spaceOscillator.start();
         }
 
         function init() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 30000);
-            
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
@@ -492,12 +448,7 @@
             const pos = [];
             for(let i=0; i<150000; i++) pos.push(THREE.MathUtils.randFloatSpread(15000), THREE.MathUtils.randFloatSpread(15000), THREE.MathUtils.randFloatSpread(10000));
             geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-            starSystem = new THREE.Points(geo, new THREE.PointsMaterial({ 
-                color: 0x8a2be2, 
-                size: 2.2, 
-                transparent: true,
-                blending: THREE.AdditiveBlending 
-            }));
+            starSystem = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0x8a2be2, size: 2.2, transparent: true, blending: THREE.AdditiveBlending }));
             scene.add(starSystem);
 
             const tunnelGeo = new THREE.CylinderGeometry(50, 50, 5000, 64, 1, true);
@@ -521,28 +472,13 @@
 
             if (isTraveling) {
                 const time = clock.getElapsedTime();
-
                 if (time < 10) {
-                    camera.position.z -= 3;
-                    wormholeMesh.material.opacity = 0.4;
-                    wormholeMesh.rotation.y += 0.02;
-                    starSystem.material.color.setHSL(0.7, 0.3, 0.4);
-                }
-                else if (time < 20) {
-                    wormholeMesh.material.opacity -= 0.05;
-                    starSystem.material.color.setHex(0x00ff88);
-                    camera.position.z -= 2;
-                    starSystem.rotation.z += 0.005;
-                }
-                else if (time < 30) {
-                    galaxyMesh.material.opacity = 0.8;
-                    galaxyMesh.rotation.x += 0.05;
-                    galaxyMesh.rotation.y += 0.05;
-                    galaxyMesh.scale.set(time*0.8, time*0.8, time*0.8);
-                    starSystem.material.color.setHSL((time * 0.2) % 1, 0.8, 0.5);
-                    camera.position.z -= 18;
-                }
-                else {
+                    camera.position.z -= 3; wormholeMesh.material.opacity = 0.4; wormholeMesh.rotation.y += 0.02; starSystem.material.color.setHSL(0.7, 0.3, 0.4);
+                } else if (time < 20) {
+                    wormholeMesh.material.opacity -= 0.05; starSystem.material.color.setHex(0x00ff88); camera.position.z -= 2; starSystem.rotation.z += 0.005;
+                } else if (time < 30) {
+                    galaxyMesh.material.opacity = 0.8; galaxyMesh.rotation.x += 0.05; galaxyMesh.rotation.y += 0.05; galaxyMesh.scale.set(time*0.8, time*0.8, time*0.8); starSystem.material.color.setHSL((time * 0.2) % 1, 0.8, 0.5); camera.position.z -= 18;
+                } else {
                     endAll();
                 }
             }
@@ -552,10 +488,7 @@
         window.next = (oldS, newS) => {
             document.getElementById(`scr${oldS}`).style.display = 'none';
             document.getElementById(`scr${newS}`).style.display = 'block';
-            
-            if(newS === 'glitch') {
-                setupGlitchEffect();
-            }
+            if(newS === 'glitch') setupGlitchEffect();
             if(newS === 4) typeText();
         }
 
@@ -571,30 +504,19 @@
         }
 
         window.launchSpaceMission = () => {
-            isTraveling = true;
-            clock.start();
-            playDeepSpaceMusic();
-            
+            isTraveling = true; clock.start(); playDeepSpaceMusic();
             document.getElementById('ui-wrapper').style.opacity = '0';
             setTimeout(() => { document.getElementById('ui-wrapper').style.display = 'none'; }, 1000);
         }
 
         function endAll() {
-            isTraveling = false;
-            camera.position.set(0, 0, 1500);
-            starSystem.material.color.setHex(0x8a2be2);
-            galaxyMesh.material.opacity = 0;
-            
-            if (spaceGain) {
-                spaceGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 4);
-            }
-            
+            isTraveling = false; camera.position.set(0, 0, 1500); starSystem.material.color.setHex(0x8a2be2); galaxyMesh.material.opacity = 0;
+            if (spaceGain) spaceGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 4);
             document.getElementById('final-text').style.display = 'flex';
         }
 
         window.startYourCodeSequence = () => {
             startAmbientPiano(); 
-            
             const introCanvasObj = document.getElementById('introCanvas');
             const introWrapper = document.getElementById('intro-layer-wrapper');
             const wrapper = document.getElementById('ui-wrapper');
@@ -604,21 +526,15 @@
             introWrapper.style.transform = 'scale(0.95)';
             
             setTimeout(() => {
-                introCanvasObj.style.display = 'none';
-                introWrapper.style.display = 'none';
-                
+                introCanvasObj.style.display = 'none'; introWrapper.style.display = 'none';
                 wrapper.style.display = 'flex';
-                setTimeout(() => {
-                    wrapper.style.opacity = '1';
-                }, 50);
+                setTimeout(() => { wrapper.style.opacity = '1'; }, 50);
             }, 1000);
         }
 
         init();
         window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight);
         });
     </script>
 </body>
