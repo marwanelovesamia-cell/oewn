@@ -1,541 +1,688 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Infinity Journey - Samia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> infinity journey </title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Cinzel:wght@400;700&family=Montserrat:wght@200;400;700&display=swap');
-        
-        body { margin: 0; background: #020204; overflow: hidden; font-family: 'Cairo', sans-serif; color: white; touch-action: manipulation; }
-        
-        /* --- واجهة القفل والمطر الرقمي المؤقتة --- */
-        #lock-screen-wrapper {
-            position: fixed; inset: 0; z-index: 9999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            gap: 20px; padding: 25px; box-sizing: border-box; background: transparent;
-            transition: opacity 1s ease, transform 1s ease;
-        }
-        #matrixCanvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 9998; background: #02010a; transition: opacity 1s ease; }
-        
-        .lock-message {
-            font-size: 22px; font-weight: 700; color: #ffffff; text-align: center; 
-            direction: rtl; margin: 0; text-shadow: 0 4px 25px rgba(0, 0, 0, 0.9); line-height: 1.6; max-width: 550px;
-        }
-        .instruction-text {
-            font-size: 16px; font-weight: 400; color: #ccb3ff; text-align: center;
-            direction: rtl; margin: 0; text-shadow: 0 2px 15px rgba(138, 43, 226, 0.4); max-width: 500px; line-height: 1.5;
-        }
-        .pin-container {
-            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 25px; margin-top: 15px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7); display: flex; flex-direction: column; align-items: center; gap: 15px;
-        }
-        .pin-display { display: flex; gap: 12px; margin-bottom: 5px; }
-        .pin-dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); background: transparent; transition: background 0.2s; }
-        .pin-dot.active { background: #8a2be2; border-color: #8a2be2; box-shadow: 0 0 10px #8a2be2; }
-        .pin-dot.error { background: #ff4d4d; border-color: #ff4d4d; box-shadow: 0 0 10px #ff4d4d; }
-        .pin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-        .pin-btn {
-            width: 60px; height: 60px; border-radius: 50%; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #ffffff; font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 400;
-            display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.2s;
-            user-select: none; -webkit-user-select: none;
-        }
-        .pin-btn:active { background: rgba(138, 43, 226, 0.3); border-color: #8a2be2; transform: scale(0.92); }
-
-        /* --- تصميم كودك الأساسي الأصلي --- */
-        #introCanvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 5; background: #050508; transition: opacity 1s ease; }
-        #intro-layer-wrapper {
-            position: fixed; inset: 0; z-index: 10; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            gap: 30px; padding: 20px; box-sizing: border-box; transition: opacity 1s ease, transform 1s ease;
-        }
-        .mini-heart {
-            width: 20px; height: 20px; background-color: #ffffff; position: relative;
-            transform: rotate(-45deg); animation: heartBeat 1.4s infinite ease-in-out;
-            box-shadow: 0 0 35px rgba(255, 255, 255, 1); margin-bottom: 5px;
-        }
-        .mini-heart::before, .mini-heart::after { content: ""; width: 20px; height: 20px; background-color: #ffffff; border-radius: 50%; position: absolute; }
-        .mini-heart::before { top: -10px; left: 0; }
-        .mini-heart::after { left: 10px; top: 0; }
-        @keyframes heartBeat { 0%, 100% { transform: scale(1) rotate(-45deg); } 50% { transform: scale(1.2) rotate(-45deg); filter: brightness(1.4); } }
-
-        .graphic-text {
-            font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 200; letter-spacing: 7px; color: #ffffff; line-height: 1.8; text-align: center;
-            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.9); margin: 0;
-        }
-        .bold-line { font-weight: 700; display: block; letter-spacing: 9px; margin-top: 8px; color: rgba(255,255,255,0.95); }
-
-        .beautiful-clock-wrapper { display: flex; align-items: center; gap: 12px; margin-top: 15px; }
-        .clock-box {
-            background: rgba(15, 15, 25, 0.65); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(138, 43, 226, 0.35); border-radius: 16px; padding: 14px 16px; min-width: 65px; text-align: center;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8), inset 0 1px 2px rgba(255,255,255,0.15), 0 0 15px rgba(138, 43, 226, 0.1); transition: all 0.3s ease;
-        }
-        .clock-num { font-family: 'Montserrat', sans-serif; font-size: 38px; font-weight: 400; color: #ffffff; line-height: 1; text-shadow: 0 0 20px rgba(255, 255, 255, 0.85), 0 0 30px rgba(138, 43, 226, 0.3); }
-        .clock-label { font-size: 9px; color: #8a2be2; text-transform: uppercase; letter-spacing: 2px; margin-top: 8px; font-family: 'Montserrat', sans-serif; font-weight: 700; text-shadow: 0 0 5px rgba(138, 43, 226, 0.5); }
-        .clock-colon { font-family: 'Montserrat', sans-serif; font-size: 32px; font-weight: 200; color: rgba(138, 43, 226, 0.6); animation: blink 1s infinite; text-shadow: 0 0 15px rgba(138, 43, 226, 0.4); padding-bottom: 22px; }
-        @keyframes blink { 50% { opacity: 0.1; } 0%, 100% { opacity: 1; } }
-
-        .countdown-subtext {
-            font-family: 'Cairo', sans-serif; font-size: 14px; color: rgba(255, 255, 255, 0.75); text-align: center; margin-top: 5px; direction: rtl;
-            letter-spacing: 0.5px; background: rgba(138, 43, 226, 0.05); padding: 8px 28px; border-radius: 30px; border: 1px solid rgba(138, 43, 226, 0.2); text-shadow: 0 2px 12px rgba(0,0,0,0.7);
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, sans-serif;
         }
 
-        .respond-btn {
-            background: transparent; border: 1px solid rgba(255, 255, 255, 0.2); color: #f4f4f6; padding: 16px 50px; font-size: 11px; letter-spacing: 7px; text-transform: uppercase;
-            cursor: pointer; box-shadow: 0 4px 30px rgba(0,0,0,0.6); font-family: 'Montserrat', sans-serif; transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); margin-top: 15px; border-radius: 30px;
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #020004;
+            color: #fff;
         }
-        .respond-btn:hover { background: #ffffff; color: #020204; border-color: #ffffff; box-shadow: 0 0 45px rgba(255, 255, 255, 0.4); letter-spacing: 9px; }
 
-        #threeCanvas { position: fixed; inset: 0; z-index: 1; }
-        #ui-wrapper { position: fixed; inset: 0; z-index: 100; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 15px; opacity: 0; transition: opacity 1s ease; }
-        .glass-card { background: rgba(10, 5, 20, 0.85); backdrop-filter: blur(20px); border: 2px solid #8a2be2; padding: 25px; border-radius: 25px; text-align: center; width: 85%; max-width: 450px; box-shadow: 0 0 50px rgba(138, 43, 226, 0.5); }
-        .custom-title { font-size: 18px; font-weight: bold; color: #ffcccc; margin-bottom: 15px; text-align: right; direction: rtl; }
-        .custom-text-small { font-size: 14px; line-height: 1.6; color: #e0e0e0; text-align: right; direction: rtl; }
-        
-        .glitch-text-container { display: block; position: relative; font-size: 16px; line-height: 1.6; color: #ffcccc; text-align: center; direction: ltr; perspective: 1000px; }
-        .glitch-word { display: inline-block; transition: all 1.5s cubic-bezier(0.25, 1, 0.5, 1); position: relative; white-space: pre; }
-        #typewriter { font-size: 19px; line-height: 1.7; color: #fff; min-height: 100px; text-align: right; direction: rtl; }
+        #cosmic-engine {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
 
-        .btn { background: none; border: 1px solid #fff; color: #fff; padding: 10px 35px; border-radius: 50px; cursor: pointer; font-size: 17px; margin-top: 20px; transition: 0.5s; }
-        .btn:hover { background: #fff; color: #000; box-shadow: 0 0 30px #fff; }
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2;
+            padding: 20px;
+        }
 
-        #portal-container { display: none; flex-direction: column; align-items: center; cursor: pointer; margin-top: 30px; }
-        .wormhole-core { width: 100px; height: 100px; background: #000; border-radius: 50%; box-shadow: 0 0 60px #8a2be2, inset 0 0 40px #000, 0 0 100px #fff; position: relative; animation: pulse 2s infinite ease-in-out; }
-        
-        #final-text { position: fixed; inset: 0; z-index: 200; display: none; justify-content: center; align-items: center; text-align: center; font-size: 35px; font-weight: bold; pointer-events: none; text-shadow: 0 0 30px #8a2be2, 0 0 50px #fff; padding: 20px; }
-        .wait-text { font-size: 14px; color: #ff4d4d; margin-top: 15px; font-family: 'Cairo', sans-serif; text-shadow: 0 0 5px rgba(255,0,0,0.3); }
+        .screen.active {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+
+        .btn-stellar {
+            position: relative;
+            margin-top: 30px;
+            padding: 14px 55px;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #fff;
+            background: rgba(4, 2, 9, 0.85);
+            border: 2px solid #00ffff;
+            border-radius: 12px;
+            cursor: pointer;
+            text-shadow: 0 0 8px #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3), inset 0 0 10px rgba(0, 255, 255, 0.2);
+            transition: all 0.4s ease;
+        }
+
+        .btn-stellar:hover {
+            border-color: #ff00ff;
+            text-shadow: 0 0 12px #ff00ff;
+            box-shadow: 0 0 25px rgba(255, 0, 255, 0.6), inset 0 0 15px rgba(255, 0, 255, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .glass-universe {
+            position: relative;
+            background: rgba(6, 3, 15, 0.82);
+            padding: 45px 35px;
+            border-radius: 16px;
+            max-width: 650px;
+            width: 100%;
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.95), inset 0 0 20px rgba(112, 0, 255, 0.2);
+            text-align: center;
+            border: 2px solid transparent;
+            background-image: linear-gradient(rgba(6, 3, 15, 0.82), rgba(6, 3, 15, 0.82)), 
+                              linear-gradient(135deg, #00ffff, #ff00ff, #7000ff, #00ffff);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            background-size: 300% 300%;
+            animation: neonFrameMove 4s linear infinite;
+        }
+
+        @keyframes neonFrameMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .phone-display {
+            width: 100%;
+            margin-bottom: 25px;
+        }
+
+        .input-stellar {
+            width: 100%;
+            padding: 14px;
+            font-size: 2.2rem;
+            text-align: center;
+            letter-spacing: 12px;
+            background: rgba(2, 1, 5, 0.9);
+            border: 2px solid #00ffff;
+            color: #00ffff;
+            border-radius: 8px;
+            outline: none;
+            font-family: monospace;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+        }
+
+        .keypad-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            width: 100%;
+            max-width: 290px;
+            margin: 0 auto;
+        }
+
+        .key-btn {
+            aspect-ratio: 1;
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.04);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .key-btn:hover {
+            background: rgba(0, 255, 255, 0.15);
+            border-color: #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+            transform: scale(1.03);
+        }
+
+        .title-neon {
+            font-size: 4.8rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(0,255,255,0.8), 0 0 40px rgba(255,0,255,0.8);
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+
+        .text-cosmic {
+            font-size: 1.45rem;
+            line-height: 2.3;
+            color: #f1f5f9;
+            text-align: justify;
+        }
+
+        #error-msg {
+            color: #ff0055;
+            font-weight: bold;
+            margin-top: 10px;
+            visibility: hidden;
+            text-shadow: 0 0 10px rgba(255,0,85,0.5);
+        }
+
+        .final-message {
+            font-family: 'Georgia', serif;
+            font-size: 4.5rem;
+            font-weight: bold;
+            font-style: italic;
+            color: #ffffff;
+            text-shadow: 0 0 20px #00ffff, 0 0 40px #00aaff, 0 0 60px #00ffff, 0 0 80px #ff00ff;
+            opacity: 0;
+            transform: scale(0.3) rotate(-5deg);
+            transition: all 2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-bottom: 35px;
+            z-index: 10;
+            letter-spacing: 2px;
+        }
+
+        .final-message.reveal {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+        }
+
+        #end-card {
+            opacity: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 5;
+        }
     </style>
 </head>
 <body>
 
-    <canvas id="matrixCanvas"></canvas>
-    <div id="lock-screen-wrapper">
-        <h1 class="lock-message">لن يفتح هذا ولن ترين شيئاً إلا بعد فتحه من صاحب الكود يا بنت...</h1>
-        <p class="instruction-text">تسناي من بعد او نوريك كلمة سر باش تشوفي شنو صيبت</p>
-        
-        <div class="pin-container">
-            <div class="pin-display" id="pinDisplay">
-                <div class="pin-dot"></div>
-                <div class="pin-dot"></div>
-                <div class="pin-dot"></div>
-                <div class="pin-dot"></div>
+    <canvas id="cosmic-engine"></canvas>
+
+    <div class="screen active" id="scr-lock">
+        <div class="glass-universe" style="max-width: 390px;">
+            <p style="font-size: 1.1rem; line-height: 1.7; margin-bottom: 25px; color: #cbd5e1;">دبا جا وقت تشوفي شنو صيبت لك ماشي شحاجة كبيرة ولكن اكفي مصيبة على قبلك</p>
+            <div class="phone-display">
+                <input type="password" id="secret-key" class="input-stellar" placeholder="••••" maxlength="4" readonly>
+                <p id="error-msg">الشيفرة غير صحيحة! جرب مجدداً.</p>
             </div>
-            <div class="pin-grid">
-                <div class="pin-btn" onclick="pressPin(1)">1</div>
-                <div class="pin-btn" onclick="pressPin(2)">2</div>
-                <div class="pin-btn" onclick="pressPin(3)">3</div>
-                <div class="pin-btn" onclick="pressPin(4)">4</div>
-                <div class="pin-btn" onclick="pressPin(5)">5</div>
-                <div class="pin-btn" onclick="pressPin(6)">6</div>
-                <div class="pin-btn" onclick="pressPin(7)">7</div>
-                <div class="pin-btn" onclick="pressPin(8)">8</div>
-                <div class="pin-btn" onclick="pressPin(9)">9</div>
-            </div>
-        </div>
-    </div>
-
-    <audio id="bgMusic" loop>
-        <source src="https://assets.mixkit.co/music/preview/mixkit-deep-space-966.mp3" type="audio/mpeg">
-    </audio>
-
-    <canvas id="introCanvas"></canvas>
-    
-    <div id="intro-layer-wrapper">
-        <div class="mini-heart"></div>
-        <p class="graphic-text">
-            I will see you again...
-            <span class="bold-line">Our connection will never fade.</span>
-        </p>
-        
-        <div class="beautiful-clock-wrapper">
-            <div class="clock-box"><div class="clock-num" id="daysBox">22</div><div class="clock-label">Days</div></div>
-            <div class="clock-colon">:</div>
-            <div class="clock-box"><div class="clock-num" id="hoursBox">00</div><div class="clock-label">Hours</div></div>
-            <div class="clock-colon">:</div>
-            <div class="clock-box"><div class="clock-num" id="minutesBox">00</div><div class="clock-label">Mins</div></div>
-            <div class="clock-colon">:</div>
-            <div class="clock-box"><div class="clock-num" id="secondsBox">00</div><div class="clock-label">Secs</div></div>
-        </div>
-        
-        <div class="countdown-subtext">الان حتا دلك الحين سنتواصل مدى الحياة 😊</div>
-        <button class="respond-btn" onclick="startYourCodeSequence()">Respond</button>
-    </div>
-
-    <div id="ui-wrapper">
-        <div class="glass-card" id="scr0">
-            <div class="custom-title">حتا رجال تبكي بسبب فقد شخص يحبونه أو ضغوط نفسية يعني ماشي لبكيت راه مشي راجل انا رجل </div>
-            <div class="custom-text-small">
-                هادي ثالت ليلة كنبكي على شي حد أول ليلة ماما ثاني ليلة جداتي ماتت نهار وطني ديل تاسعة سبحان الله اي حاجة كتوقع ليا كتوقع في نهار ليكون خيب أو ليلة ٣ هد ليلة بسبب مغنبقاش نشوف بنت لكنبغي أو صحابي أو مكنتش غنكون هك كون كان شي دعم نفسي في دار ولكن خاوية كيف ديما كون كانو كنت انكون مرتاح او فيا سخانة  مهم عارفو شعور مؤقت ولكن صعيب حتش ديجا بوحدي أو فاقد بزاف ناس كانو عزاز أو حسيت تاني هك معك مهم فرحان بعدا حت انبقاو على تواصل ديما...  كتبت هادشي هنا حت معرفتش لمن نقولو نتي دبا مشغولة الله يوفقك
-            </div>
-            <button class="btn" onclick="next(0, 'glitch')">أستمر</button>
-        </div>
-
-        <div class="glass-card" id="scrglitch" style="display:none">
-            <div class="glitch-text-container" id="glitchContent">I feel deeply saddened by what I saw today during PE class, because I do not receive even a fraction of what I do for you. Yet, you choose someone else and treat them so well, while showing me only a cold, arrogant face.  صعيييبة نحس بغيتيني كفاش معاه كضحكي او حد شي مع باركة شفتك الى اسمية دبا ؟ </div>
-            <div id="glitchWaitMsg" class="wait-text">انتظري 30 ثانية لاتمام مرحلة...</div>
-            <br>
-            <button class="btn" id="glitchContinueBtn" onclick="next('glitch', 1)" style="display: none;">Continue</button>
-        </div>
-
-        <div class="glass-card" id="scr1" style="display:none">
-            <h1 style="font-size: 35px;">Welcome Samia</h1>
-            <p>Welcome to a world of my creation</p>
-            <button class="btn" onclick="next(1,2)">Enter</button>
-        </div>
-        <div class="glass-card" id="scr2" style="display:none">
-            <p>مرحباً، هذا صنع في اليوم 2026.4.12... مصنوع بيد شخص رخص وقته ليعبر لكِ عما في راسو او قلبو (خدا مني هد كود سمانة بمعنى 5دقيق في نهار متخيليش انني كنسهر مثلا باش نصوبو  معقد هدشي عدبني عرفتي شحال ديال كتبة ولكن هانية اصلا ندير لك اي حاجة ماشي مهم كنتمنى تقدري مجهود لكندير على قبلك حت والله كنبغيك بزاف ).</p>
-            <button class="btn" onclick="next(2,3)">التالي</button>
-        </div>
-        <div class="glass-card" id="scr3" style="display:none">
-            <p style="font-size: 26px; font-weight: bold;">أولاً سأقول لكِ شيئاً..</p>
-            <button class="btn" onclick="next(3,4)">استمر</button>
-        </div>
-        <div class="glass-card" id="scr4" style="display:none">
-            <div id="typewriter"></div>
-            <div id="portal-container" onclick="launchSpaceMission()">
-                <div class="wormhole-core"></div>
-                <p style="margin-top: 15px; letter-spacing: 5px; font-weight: bold; color: #fff;">صافري</p>
+            <div class="keypad-grid">
+                <button class="key-btn" onclick="pressKey('1')">1</button>
+                <button class="key-btn" onclick="pressKey('2')">2</button>
+                <button class="key-btn" onclick="pressKey('3')">3</button>
+                <button class="key-btn" onclick="pressKey('4')">4</button>
+                <button class="key-btn" onclick="pressKey('5')">5</button>
+                <button class="key-btn" onclick="pressKey('6')">6</button>
+                <button class="key-btn" onclick="pressKey('7')">7</button>
+                <button class="key-btn" onclick="pressKey('8')">8</button>
+                <button class="key-btn" onclick="pressKey('9')">9</button>
+                <button class="key-btn" style="font-size: 1rem; border-color: rgba(255,0,85,0.5);" onclick="clearKey()">حذف</button>
+                <button class="key-btn" onclick="pressKey('0')">0</button>
+                <button class="key-btn" style="font-size: 1rem; border-color: rgba(0,255,255,0.5);" onclick="checkAccess()">Next</button>
             </div>
         </div>
     </div>
 
-    <div id="final-text">That’s all there is, my dear.</div>
+    <div class="screen" id="scr-welcome">
+        <div class="glass-universe" style="background: transparent; box-shadow: none; border: none; max-width: 100%;">
+            <h1 class="title-neon">Welcome Samia</h1>
+            <button class="btn-stellar" onclick="transit(3)">Next</button>
+        </div>
+    </div>
+
+    <div class="screen" id="scr-t1">
+        <div class="glass-universe">
+            <p class="text-cosmic">سلام مهم نتي عارفة علاش صيبت لك هادا أو عارفا علاش ، يك وخا أنا متناقض بعد مرات ولكن دكشي لفراسك هوا لصحيح ، اaاه بصراحة هادشي بدا من نهار تلاقيتك في مدينة حت ميمكنش نتوقع نشوفك أو نشوفك .</p>
+            <button class="btn-stellar" onclick="transit(4)">Next</button>
+        </div>
+    </div>
+
+    <div class="screen" id="scr-t2">
+        <div class="glass-universe">
+            <p class="text-cosmic">في راسك باقي كيجيني في شكل ندير هادشي على قبل شي حد عادي مهم نتمنى تقدري دكشي لكندير على قبلك اوو ،</p>
+            <button class="btn-stellar" onclick="transit(5)">Next</button>
+        </div>
+    </div>
+
+    <div class="screen" id="scr-t3">
+        <div class="glass-universe">
+            <p class="text-cosmic"> شوفي اسامية هدشي لكندير انا مرتاح فيه ماشي باش نبين لك مشاعري لي اصلن بينتهم لك في دك ضرف امكن باقي عندك حتافضي بيه حتاش هوا كيقول  كولشي بنسبة دك فلم لقلتك في دك وراق صراحة عندك احسب بك كيشبه لينا هه  .</p>
+            <button class="btn-stellar" onclick="transit(6)">Next</button>
+        </div>
+    </div>
+
+    <div class="screen" id="scr-t4">
+        <div class="glass-universe">
+            <p class="text-cosmic">  افففففففف هد كود عياني بزاف عرفتي شحال خدا مني واخة اقدر ابان لك بسيط ولكن راه معقد مهم تستاهلي اااااا او ماشي ديما غنبقى ندير على قبلك شي حاجة جتا نتي ديري شي حاجة اولى غرفتي متبقيش غير تهربي صاف .</p>
+            <button class="btn-stellar" onclick="transit(7)">Next</button>
+        </div>
+    </div>
+
+    <div class="screen" id="scr-space">
+        <div id="end-card">
+            <h1 class="final-message" id="msg-stay">Stay with me forever</h1>
+            <button class="btn-stellar" id="btn-reset-show" onclick="collapseCosmos()" style="display:none; margin-top:15px; border-color: #ff00ff; text-shadow:0 0 8px #ff00ff;">Reset</button>
+        </div>
+    </div>
 
     <script>
-        // نظام إدخال وفحص كلمة السر لمنع الدخول العشوائي
-        const CORRECT_PIN = "1234"; // يمكنك تغيير الرمز السري من هنا (من 1 إلى 9)
-        let currentInput = "";
-        const dots = document.querySelectorAll('.pin-dot');
+        let currentMode = 'purple_cyber';
+        const canvas = document.getElementById('cosmic-engine');
+        const ctx = canvas.getContext('2d');
+        let globalTime = 0;
 
-        function pressPin(num) {
-            if (currentInput.length < 4) {
-                currentInput += num;
-                dots[currentInput.length - 1].classList.add('active');
-                
-                if (currentInput.length === 4) {
-                    setTimeout(checkPin, 250);
-                }
-            }
-        }
-
-        function checkPin() {
-            if (currentInput === CORRECT_PIN) {
-                // فتح نظام الحماية واختفاء شاشة الحجب بالكامل لتظهر صفحتك الأساسية
-                document.getElementById('lock-screen-wrapper').style.opacity = '0';
-                document.getElementById('lock-screen-wrapper').style.transform = 'scale(0.95)';
-                document.getElementById('matrixCanvas').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('lock-screen-wrapper').style.display = 'none';
-                    document.getElementById('matrixCanvas').style.display = 'none';
-                    // تشغيل الأنيميشن الخلفي الخاص بكودك فوراً بعد الفتح
-                    drawIntroBackground();
-                }, 1000);
-            } else {
-                // تظليل النقاط باللون الأحمر دلالة على الخطأ وإعادة المحاولة
-                dots.forEach(dot => { dot.classList.remove('active'); dot.classList.add('error'); });
-                setTimeout(() => {
-                    dots.forEach(dot => { dot.classList.remove('error'); });
-                    currentInput = "";
-                }, 600);
-            }
-        }
-
-        // غرافيك المطر الرقمي المخصص لواجهة الحجب
-        const mCanvas = document.getElementById('matrixCanvas');
-        const mCtx = mCanvas.getContext('2d');
-        function resizeMatrix() { mCanvas.width = window.innerWidth; mCanvas.height = window.innerHeight; }
-        resizeMatrix();
-        window.addEventListener('resize', resizeMatrix);
-
-        const mFontSize = 14;
-        const mColumns = Math.floor(mCanvas.width / mFontSize) + 1;
-        const mDrops = Array(mColumns).fill(1);
-        const mChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ⏳🔒";
-
-        function drawMatrix() {
-            mCtx.fillStyle = 'rgba(2, 1, 10, 0.08)';
-            mCtx.fillRect(0, 0, mCanvas.width, mCanvas.height);
-            for (let i = 0; i < mDrops.length; i++) {
-                const text = mChars[Math.floor(Math.random() * mChars.length)];
-                if (i % 3 === 0) mCtx.fillStyle = 'rgba(138, 43, 226, 0.25)';
-                else if (i % 3 === 1) mCtx.fillStyle = 'rgba(30, 144, 255, 0.2)';
-                else mCtx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-                mCtx.font = mFontSize + 'px Montserrat';
-                mCtx.fillText(text, i * mFontSize, mDrops[i] * mFontSize);
-                if (mDrops[i] * mFontSize > mCanvas.height && Math.random() * 0.985 > 0.975) mDrops[i] = 0;
-                mDrops[i]++;
-            }
-            if (mCanvas.style.display !== 'none') requestAnimationFrame(drawMatrix);
-        }
-        drawMatrix();
-
-        // سكريبت الخلفية الرسومية لشاشتك الافتتاحية الأساسية
-        const introCanvas = document.getElementById('introCanvas');
-        const introCtx = introCanvas.getContext('2d');
-        introCanvas.width = window.innerWidth;
-        introCanvas.height = window.innerHeight;
-
-        let introTick = 0;
-        const introMouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-        window.addEventListener('mousemove', (e) => { introMouse.x = e.clientX; introMouse.y = e.clientY; });
-
-        function drawIntroBackground() {
-            introCtx.fillStyle = '#050508';
-            introCtx.fillRect(0, 0, introCanvas.width, introCanvas.height);
-            introTick += 0.004;
-            let linesCount = 8;
-            for (let i = 0; i < linesCount; i++) {
-                introCtx.beginPath();
-                let offset = i * 0.3;
-                introCtx.strokeStyle = `rgba(138, 43, 226, ${0.15 - (i * 0.01)})`;
-                introCtx.lineWidth = 1.2;
-                for (let x = 0; x < introCanvas.width; x += 10) {
-                    let wave = Math.sin(x * 0.002 + introTick + offset) * 100;
-                    let dist = Math.exp(-Math.pow(x - introMouse.x, 2) / (2 * Math.pow(300, 2)));
-                    let pull = (introMouse.y - introCanvas.height / 2) * dist * 0.6;
-                    let y = introCanvas.height / 2 + wave + pull;
-                    if (x === 0) introCtx.moveTo(x, y);
-                    else introCtx.lineTo(x, y);
-                }
-                introCtx.stroke();
-            }
-            if(introCanvas.style.display !== 'none' && document.getElementById('lock-screen-wrapper').style.display === 'none') {
-                requestAnimationFrame(drawIntroBackground);
-            }
-        }
-        window.addEventListener('resize', () => { introCanvas.width = window.innerWidth; introCanvas.height = window.innerHeight; });
-    </script>
-
-    <script type="importmap"> { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } } </script>
-
-    <script type="module">
-        import * as THREE from 'three';
-
-        let scene, camera, renderer, starSystem, wormholeMesh, galaxyMesh;
-        let isTraveling = false, clock = new THREE.Clock();
+        let snowflakes = [];
+        let fireworks = [];
         
+        let heartProgress = 0; 
+        let heartExploded = false;
+        let heartLinesCount = 500; 
+        let explodedShards = [];
+        let fireworkInterval = null;
+
+        // محرك الصوت والموسيقى المحيطية المتطورة
         let audioCtx = null;
-        let pianoInterval = null;
-        let spaceOscillator = null;
-        let spaceGain = null;
+        let ambientOscillators = []; 
+        let musicStarted = false;
 
-        const daysBox = document.getElementById('daysBox');
-        const hoursBox = document.getElementById('hoursBox');
-        const minutesBox = document.getElementById('minutesBox');
-        const secondsBox = document.getElementById('secondsBox');
-        
-        let endTime = localStorage.getItem('countdownEndTimeV2');
-        if (!endTime) {
-            endTime = Date.now() + (22 * 24 * 60 * 60 * 1000);
-            localStorage.setItem('countdownEndTimeV2', endTime);
-        } else {
-            endTime = parseInt(endTime, 10);
-        }
-
-        function updateCountdown() {
-            let now = Date.now();
-            let timeLeft = endTime - now; 
-            if (timeLeft <= 0) {
-                daysBox.innerText = "00"; hoursBox.innerText = "00"; minutesBox.innerText = "00"; secondsBox.innerText = "00";
-                return;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             }
-            let totalSecondsLeft = Math.floor(timeLeft / 1000);
-            let days = Math.floor(totalSecondsLeft / (3600 * 24));
-            let hrs = Math.floor((totalSecondsLeft % (3600 * 24)) / 3600);
-            let mins = Math.floor((totalSecondsLeft % 3600) / 60);
-            let secs = totalSecondsLeft % 60;
-
-            daysBox.innerText = days < 10 ? "0" + days : days;
-            hoursBox.innerText = hrs < 10 ? "0" + hrs : hrs;
-            minutesBox.innerText = mins < 10 ? "0" + mins : mins;
-            secondsBox.innerText = secs < 10 ? "0" + secs : secs;
-            playClockTick();
-        }
-        updateCountdown();
-        setInterval(updateCountdown, 1000);
-
-        function setupGlitchEffect() {
-            const container = document.getElementById('glitchContent');
-            const words = container.innerText.split(/(\s+)/); 
-            container.innerHTML = words.map(w => {
-                if(w.trim() === '') return w;
-                return `<span class="glitch-word">${w}</span>`;
-            }).join('');
-
-            const spans = container.querySelectorAll('.glitch-word');
-            setTimeout(() => {
-                spans.forEach(span => {
-                    const randomX = Math.floor(Math.random() * 400) - 200;
-                    const randomY = Math.floor(Math.random() * 400) - 200;
-                    const randomZ = Math.floor(Math.random() * 500) - 250;
-                    const randomRotX = Math.floor(Math.random() * 360);
-                    const randomRotY = Math.floor(Math.random() * 360);
-                    span.style.transform = `translate3d(${randomX}px, ${randomY}px, ${randomZ}px) rotateX(${randomRotX}deg) rotateY(${randomRotY}deg)`;
-                    span.style.opacity = Math.random() * 0.4 + 0.1;
-                    span.style.color = '#ff4d4d';
-                    span.style.textShadow = '0 0 10px #ff0000';
-                });
-                setTimeout(() => {
-                    spans.forEach(span => { span.style.transform = 'none'; span.style.opacity = '1'; span.style.color = '#ffcccc'; span.style.textShadow = 'none'; });
-                    document.getElementById('glitchWaitMsg').style.display = 'none';
-                    document.getElementById('glitchContinueBtn').style.display = 'inline-block';
-                }, 4000);
-            }, 30000);
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            startAmbientMusic(); 
         }
 
-        function playClockTick() {
-            if (!audioCtx) return; 
+        // توليد موسيقى فضاء محيطية هادئة (Ambient Pad) خالية تماماً من أصوات البيانو
+        function startAmbientMusic() {
+            if (musicStarted) return;
+            musicStarted = true;
+
+            try {
+                // موجات جيبية ناعمة جداً تولد نغمات خلفية دافئة مستمرة
+                createPadTone(73.42, 0.05); // نغمة D2 أساسية عميقة هادئة
+                createPadTone(110.00, 0.03); // نغمة A2 متناغمة معها بالفضاء
+
+                // دورة ألحان وترية الكترونية خفيفة جداً تظهر وتتلاشى بنعومة (كل 3 ثواني)
+                setInterval(() => {
+                    if(audioCtx && !heartExploded) {
+                        // سلم نغمات فضائية دافئة وناعمة
+                        let spaceNotes = [146.83, 164.81, 220.00, 293.66]; 
+                        let randomNote = spaceNotes[Math.floor(Math.random() * spaceNotes.length)];
+                        playSoftSpaceNote(randomNote);
+                    }
+                }, 3200);
+
+            } catch (e) {}
+        }
+
+        function createPadTone(freq, volume) {
             let osc = audioCtx.createOscillator();
-            let gain = audioCtx.createGain();
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(800, audioCtx.currentTime); 
-            gain.gain.setValueAtTime(0.012, audioCtx.currentTime); 
-            gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.04); 
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.04);
+            let gainNode = audioCtx.createGain();
+            osc.type = 'sine'; // موجة ناعمة خالية من ضربات البيانو
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            osc.start();
+            ambientOscillators.push(osc);
         }
 
-        function startAmbientPiano() {
-            if (audioCtx) return;
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            pianoInterval = setInterval(() => {
-                if (!audioCtx) return;
-                let scale = [261.63, 329.63, 392.00, 440.00, 523.25]; 
-                let randomNote = scale[Math.floor(Math.random() * scale.length)];
+        function playSoftSpaceNote(freq) {
+            try {
                 let osc = audioCtx.createOscillator();
-                let gain = audioCtx.createGain();
-                osc.type = 'sine'; osc.frequency.setValueAtTime(randomNote / 2, audioCtx.currentTime); 
-                gain.gain.setValueAtTime(0.03, audioCtx.currentTime); 
-                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 5);
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(); osc.stop(audioCtx.currentTime + 5);
-            }, 3000);
+                let gainNode = audioCtx.createGain();
+                let filter = audioCtx.createBiquadFilter();
+                
+                osc.type = 'sine'; 
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(500, audioCtx.currentTime);
+                
+                gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.02, audioCtx.currentTime + 1.2); // تدرج دخول ناعم جداً
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.8); // تلاشي بطيء جداً
+                
+                osc.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 2.9);
+            } catch(e) {}
         }
 
-        window.addEventListener('mousemove', () => { if(!audioCtx && document.getElementById('lock-screen-wrapper').style.display === 'none') startAmbientPiano(); });
-        window.addEventListener('touchstart', () => { if(!audioCtx && document.getElementById('lock-screen-wrapper').style.display === 'none') startAmbientPiano(); });
-
-        function playDeepSpaceMusic() {
-            if (pianoInterval) clearInterval(pianoInterval);
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            spaceOscillator = audioCtx.createOscillator();
-            spaceGain = audioCtx.createGain();
-            spaceOscillator.type = 'triangle'; 
-            spaceOscillator.frequency.setValueAtTime(110.00, audioCtx.currentTime); 
-            let lfo = audioCtx.createOscillator();
-            let lfoGain = audioCtx.createGain();
-            lfo.type = 'sine'; lfo.frequency.setValueAtTime(0.2, audioCtx.currentTime); 
-            lfoGain.gain.setValueAtTime(1.5, audioCtx.currentTime);
-            lfo.connect(lfoGain); lfoGain.connect(spaceOscillator.frequency);
-            spaceGain.gain.setValueAtTime(0.0, audioCtx.currentTime);
-            spaceGain.gain.linearRampToValueAtTime(0.06, audioCtx.currentTime + 3); 
-            spaceOscillator.connect(spaceGain); spaceGain.connect(audioCtx.destination);
-            lfo.start(); spaceOscillator.start();
-        }
-
-        function init() {
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 30000);
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            renderer.domElement.id = "threeCanvas";
-            document.body.appendChild(renderer.domElement);
-
-            const geo = new THREE.BufferGeometry();
-            const pos = [];
-            for(let i=0; i<150000; i++) pos.push(THREE.MathUtils.randFloatSpread(15000), THREE.MathUtils.randFloatSpread(15000), THREE.MathUtils.randFloatSpread(10000));
-            geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-            starSystem = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0x8a2be2, size: 2.2, transparent: true, blending: THREE.AdditiveBlending }));
-            scene.add(starSystem);
-
-            const tunnelGeo = new THREE.CylinderGeometry(50, 50, 5000, 64, 1, true);
-            const tunnelMat = new THREE.MeshBasicMaterial({ color: 0x443355, wireframe: true, transparent: true, opacity: 0, side: THREE.BackSide });
-            wormholeMesh = new THREE.Mesh(tunnelGeo, tunnelMat);
-            wormholeMesh.rotation.x = Math.PI / 2;
-            scene.add(wormholeMesh);
-
-            const galGeo = new THREE.TorusKnotGeometry(40, 15, 200, 20);
-            const galMat = new THREE.MeshNormalMaterial({ transparent: true, opacity: 0 });
-            galaxyMesh = new THREE.Mesh(galGeo, galMat);
-            scene.add(galaxyMesh);
-
-            camera.position.z = 2000;
-            animate();
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-            starSystem.rotation.y += 0.0004;
-
-            if (isTraveling) {
-                const time = clock.getElapsedTime();
-                if (time < 10) {
-                    camera.position.z -= 3; wormholeMesh.material.opacity = 0.4; wormholeMesh.rotation.y += 0.02; starSystem.material.color.setHSL(0.7, 0.3, 0.4);
-                } else if (time < 20) {
-                    wormholeMesh.material.opacity -= 0.05; starSystem.material.color.setHex(0x00ff88); camera.position.z -= 2; starSystem.rotation.z += 0.005;
-                } else if (time < 30) {
-                    galaxyMesh.material.opacity = 0.8; galaxyMesh.rotation.x += 0.05; galaxyMesh.rotation.y += 0.05; galaxyMesh.scale.set(time*0.8, time*0.8, time*0.8); starSystem.material.color.setHSL((time * 0.2) % 1, 0.8, 0.5); camera.position.z -= 18;
+        // أصوات تفجيرات الألعاب النارية المتوازنة هيبياً
+        function playExplosionSound(isMainSupernova = false) {
+            if (!audioCtx) return;
+            try {
+                let osc = audioCtx.createOscillator();
+                let gainNode = audioCtx.createGain();
+                let filter = audioCtx.createBiquadFilter();
+                
+                osc.type = 'sawtooth'; 
+                filter.type = 'lowpass';
+                
+                if (isMainSupernova) {
+                    osc.frequency.setValueAtTime(90, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(5, audioCtx.currentTime + 1.2);
+                    filter.frequency.setValueAtTime(250, audioCtx.currentTime);
+                    filter.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 1.2);
+                    gainNode.gain.setValueAtTime(0.8, audioCtx.currentTime);
                 } else {
-                    endAll();
+                    // أصوات فرعية منخفضة ومريحة
+                    osc.frequency.setValueAtTime(130, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(15, audioCtx.currentTime + 0.4);
+                    filter.frequency.setValueAtTime(350, audioCtx.currentTime);
+                    filter.frequency.exponentialRampToValueAtTime(15, audioCtx.currentTime + 0.4);
+                    gainNode.gain.setValueAtTime(0.25, audioCtx.currentTime); // خفض مستوى صوت الفرقعة الفرعية
+                }
+                
+                gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + (isMainSupernova ? 1.2 : 0.4));
+                
+                osc.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + (isMainSupernova ? 1.2 : 0.4));
+            } catch(e) {}
+        }
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function initSnow() {
+            snowflakes = [];
+            for (let i = 0; i < 180; i++) {
+                snowflakes.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 2.5 + 0.5,
+                    vx: Math.random() * 0.4 - 0.2,
+                    vy: Math.random() * 0.6 + 0.4,
+                    opacity: Math.random() * 0.6 + 0.2
+                });
+            }
+        }
+
+        function drawSnow() {
+            for (let s of snowflakes) {
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${s.opacity})`;
+                ctx.fill();
+                s.y += s.vy; s.x += s.vx;
+                if (s.y > canvas.height) { s.y = -10; s.x = Math.random() * canvas.width; }
+            }
+        }
+
+        function drawGeometricFractal(cx, cy, time) {
+            ctx.save();
+            ctx.translate(cx, cy);
+            let linesCount = 180;
+            let radiusModifier = Math.sin(time * 0.2) * 80;
+
+            for (let i = 0; i < linesCount; i++) {
+                let angle = (i * Math.PI * 2) / linesCount;
+                let r = (Math.sin(angle * 4 + time) * 220) + (Math.cos(angle * 7 - time) * 140) + 400 + radiusModifier;
+                let x1 = Math.sin(angle) * (r * 0.2);
+                let y1 = Math.cos(angle) * (r * 0.2);
+                let x2 = Math.sin(angle + Math.sin(time + i * 0.04)) * r;
+                let y2 = Math.cos(angle + Math.cos(time + i * 0.04)) * r;
+
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.quadraticCurveTo(x1 * 2, y1 * 2, x2, y2);
+                
+                if (currentMode === 'purple_cyber') ctx.strokeStyle = `hsla(${270 + Math.sin(time + i*0.1)*35}, 90%, 50%, 0.11)`;
+                else if (currentMode === 'cyan_grid') ctx.strokeStyle = `hsla(${190 + Math.cos(time + i*0.1)*30}, 95%, 55%, 0.11)`;
+                else if (currentMode === 'neon_plasma') ctx.strokeStyle = `hsla(${310 + Math.sin(time)*45}, 90%, 60%, 0.11)`;
+                else if (currentMode === 'deep_matrix') ctx.strokeStyle = `hsla(${160 + Math.sin(time + i)*35}, 85%, 45%, 0.11)`;
+                else if (currentMode === 'bio_violet') ctx.strokeStyle = `hsla(${285 + Math.cos(time)*35}, 90%, 50%, 0.11)`;
+                else if (currentMode === 'abstract_electric') ctx.strokeStyle = `hsla(${210 + Math.sin(time)*55}, 100%, 60%, 0.10)`;
+
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        function getHeartPoint(t, scale) {
+            let x = 16 * Math.pow(Math.sin(t), 3);
+            let y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+            return { x: x * scale, y: y * scale };
+        }
+
+        function drawGeometricHeart() {
+            if (currentMode !== 'ultimate_heart') return;
+
+            let cx = canvas.width / 2;
+            let cy = canvas.height / 2 - 20;
+            let scale = Math.min(canvas.width, canvas.height) * 0.022;
+
+            if (!heartExploded) {
+                if (heartProgress < 1) {
+                    heartProgress += 0.00112; 
+                } else {
+                    triggerHeartExplosion(cx, cy, scale);
+                }
+
+                ctx.save();
+                ctx.translate(cx, cy);
+                ctx.rotate(Math.sin(globalTime * 0.15) * 0.2); 
+                
+                let limit = Math.floor(heartLinesCount * Math.min(heartProgress, 1));
+                
+                for (let i = 0; i < limit; i++) {
+                    let t1 = (i / heartLinesCount) * Math.PI * 2;
+                    let t2 = t1 + Math.PI + Math.sin(globalTime * 0.3) * 0.5;
+
+                    let p1 = getHeartPoint(t1, scale);
+                    let p2 = getHeartPoint(t2, scale * 0.9); 
+
+                    ctx.beginPath();
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    
+                    ctx.strokeStyle = `hsla(${190 + Math.sin(globalTime + i*0.02)*20}, 100%, 65%, 0.22)`;
+                    ctx.lineWidth = 1.3;
+                    ctx.stroke();
+                }
+                ctx.restore();
+            } else {
+                for (let i = explodedShards.length - 1; i >= 0; i--) {
+                    let s = explodedShards[i];
+                    s.x += s.vx; s.y += s.vy;
+                    s.vx *= 0.985; s.vy *= 0.985;
+                    s.alpha -= 0.006;
+
+                    if (s.alpha <= 0) {
+                        explodedShards.splice(i, 1);
+                        continue;
+                    }
+
+                    ctx.beginPath();
+                    ctx.moveTo(s.x, s.y);
+                    ctx.lineTo(s.x + s.vx * 2.5, s.y + s.vy * 2.5);
+                    ctx.strokeStyle = `hsla(${s.hue}, 100%, 70%, ${s.alpha})`;
+                    ctx.lineWidth = 2.5;
+                    ctx.stroke();
                 }
             }
-            renderer.render(scene, camera);
         }
 
-        window.next = (oldS, newS) => {
-            document.getElementById(`scr${oldS}`).style.display = 'none';
-            document.getElementById(`scr${newS}`).style.display = 'block';
-            if(newS === 'glitch') setupGlitchEffect();
-            if(newS === 4) typeText();
-        }
+        function triggerHeartExplosion(cx, cy, scale) {
+            heartExploded = true;
+            
+            // إيقاف خط الموسيقى الخلفية بلطف لإبراز هيبة تفجير الهيكل الرئيسي
+            ambientOscillators.forEach(osc => { try { osc.stop(); } catch(e){} });
 
-        function typeText() {
-            const msg = " شوفي بغيت نقول لك هادشي لدجا قولتو لك مرات بزاف نتي عارفا بلي أنا كنبغيك امكن وعارفة كولشي  صراحة بديت كنبغيك من نهار تلاقيتك دك نهار في مدينة معندي مدنير كنكره هاكا مباغيش نتصاحب باغي نبقا طنروكيل،مكنتش باغي نبغي , أصلا ماشي عيب تبغي شي حد يك المهم لحاجة لباغي دجا قلته لك نبقاو ديما على تواصل واخة تكوني نتي م ، معارفش اشنو نقول مهم تبقاي قريبة لي  (كنحس بلي أنا درامي وتفك مهم  نا مهم انا عادي.. مهم فهمي شنو بغيت نوصل لك اوصفي  ويبقا السؤال شنو درتي على قبلي نتي؟؟؟؟؟؟؟؟) .";
-            let i = 0;
-            const container = document.getElementById('typewriter');
-            function type() {
-                if (i < msg.length) { container.innerHTML += msg.charAt(i); i++; setTimeout(type, 40); }
-                else document.getElementById('portal-container').style.display = 'flex';
+            playExplosionSound(true); 
+
+            for (let i = 0; i < heartLinesCount; i++) {
+                let t = (i / heartLinesCount) * Math.PI * 2;
+                let pt = getHeartPoint(t, scale);
+                let angle = Math.atan2(pt.y, pt.x) + (Math.random() - 0.5) * 0.5;
+                let speed = Math.random() * 22 + 8; 
+
+                explodedShards.push({
+                    x: cx + pt.x,
+                    y: cy + pt.y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    hue: Math.random() > 0.5 ? 195 : 310, 
+                    alpha: 1
+                });
             }
-            type();
+
+            // تم زيادة المدة الزمنية بين الإطلاقات لتخفيف الألعاب النارية بناءً على رغبتك (من 200ms إلى 550ms)
+            fireworkInterval = setInterval(launchFirework, 550); 
+
+            document.getElementById('msg-stay').classList.add('reveal');
+            document.getElementById('btn-reset-show').style.display = 'inline-block';
         }
 
-        window.launchSpaceMission = () => {
-            isTraveling = true; clock.start(); playDeepSpaceMusic();
-            document.getElementById('ui-wrapper').style.opacity = '0';
-            setTimeout(() => { document.getElementById('ui-wrapper').style.display = 'none'; }, 1000);
+        function launchFirework() {
+            if (!heartExploded) return;
+            // تم تقليل الإطلاق إلى قذيفة واحدة مريحة ومتفرقة بدلاً من قذيفتين معاً
+            let fx = Math.random() * canvas.width;
+            let fy = Math.random() * (canvas.height * 0.45) + 60;
+            let hue = Math.random() * 360;
+
+            playExplosionSound(false); 
+
+            // تقليل عدد شظايا اللعبة النارية الواحدة (من 70 إلى 45) لتبدو خفيفة وراقية بصرياً
+            for (let i = 0; i < 45; i++) {
+                let angle = (i / 45) * Math.PI * 2;
+                let speed = Math.random() * 5 + 2.5;
+                fireworks.push({
+                    x: fx, y: fy,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    alpha: 1, hue: hue, size: Math.random() * 2 + 1
+                });
+            }
         }
 
-        function endAll() {
-            isTraveling = false; camera.position.set(0, 0, 1500); starSystem.material.color.setHex(0x8a2be2); galaxyMesh.material.opacity = 0;
-            if (spaceGain) spaceGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 4);
-            document.getElementById('final-text').style.display = 'flex';
+        function drawFireworks() {
+            for (let i = fireworks.length - 1; i >= 0; i--) {
+                let f = fireworks[i];
+                f.x += f.vx; f.y += f.vy;
+                f.vy += 0.04; f.alpha -= 0.01;
+
+                if (f.alpha <= 0) {
+                    fireworks.splice(i, 1);
+                    continue;
+                }
+                ctx.beginPath();
+                ctx.arc(f.x, f.y, f.size, 0, Math.PI * 2);
+                ctx.fillStyle = `hsla(${f.hue}, 95%, 65%, ${f.alpha})`;
+                ctx.fill();
+            }
         }
 
-        window.startYourCodeSequence = () => {
-            startAmbientPiano(); 
-            const introCanvasObj = document.getElementById('introCanvas');
-            const introWrapper = document.getElementById('intro-layer-wrapper');
-            const wrapper = document.getElementById('ui-wrapper');
-            
-            introCanvasObj.style.opacity = '0';
-            introWrapper.style.opacity = '0';
-            introWrapper.style.transform = 'scale(0.95)';
-            
-            setTimeout(() => {
-                introCanvasObj.style.display = 'none'; introWrapper.style.display = 'none';
-                wrapper.style.display = 'flex';
-                setTimeout(() => { wrapper.style.opacity = '1'; }, 50);
-            }, 1000);
+        function engineLoop() {
+            globalTime += 0.015;
+
+            ctx.fillStyle = currentMode === 'ultimate_heart' ? 'rgba(2, 0, 4, 0.3)' : 'rgba(2, 0, 4, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.globalCompositeOperation = 'screen';
+
+            if (currentMode !== 'ultimate_heart') {
+                let cx = canvas.width / 2;
+                let cy = canvas.height / 2;
+                drawGeometricFractal(cx, cy, globalTime);
+                drawGeometricFractal(cx, cy, -globalTime * 0.5);
+            } else {
+                drawSnow(); 
+                drawGeometricHeart(); 
+                drawFireworks(); 
+            }
+
+            ctx.globalCompositeOperation = 'source-over';
+            requestAnimationFrame(engineLoop);
         }
 
-        init();
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+        initSnow();
+        requestAnimationFrame(engineLoop);
+
+        const displayInput = document.getElementById('secret-key');
+        const errMsg = document.getElementById('error-msg');
+
+        function pressKey(num) {
+            initAudio(); 
+            errMsg.style.visibility = 'hidden';
+            if (displayInput.value.length < 4) displayInput.value += num;
+            if (displayInput.value.length === 4) setTimeout(checkAccess, 250);
+        }
+
+        function clearKey() {
+            displayInput.value = displayInput.value.slice(0, -1);
+            errMsg.style.visibility = 'hidden';
+        }
+
+        function checkAccess() {
+            if (displayInput.value === "1234") {
+                errMsg.style.visibility = 'hidden';
+                transit(2);
+            } else {
+                errMsg.style.visibility = 'visible';
+                displayInput.value = '';
+            }
+        }
+
+        function transit(targetGate) {
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(s => s.classList.remove('active'));
+
+            let id = '';
+            if (targetGate === 2) { currentMode = 'cyan_grid'; id = 'scr-welcome'; }
+            else if (targetGate === 3) { currentMode = 'neon_plasma'; id = 'scr-t1'; }
+            else if (targetGate === 4) { currentMode = 'deep_matrix'; id = 'scr-t2'; }
+            else if (targetGate === 5) { currentMode = 'bio_violet'; id = 'scr-t3'; }
+            else if (targetGate === 6) { currentMode = 'abstract_electric'; id = 'scr-t4'; }
+            else if (targetGate === 7) { 
+                currentMode = 'ultimate_heart'; 
+                id = 'scr-space'; 
+                
+                initAudio(); 
+                heartProgress = 0;
+                heartExploded = false;
+                explodedShards = [];
+                fireworks = [];
+                document.getElementById('msg-stay').classList.remove('reveal');
+                document.getElementById('btn-reset-show').style.display = 'none';
+                if (fireworkInterval) clearInterval(fireworkInterval);
+            }
+
+            document.getElementById(id).classList.add('active');
+        }
+
+        function collapseCosmos() {
+            displayInput.value = '';
+            currentMode = 'purple_cyber';
+            musicStarted = false;
+            ambientOscillators = [];
+            if (fireworkInterval) clearInterval(fireworkInterval);
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(s => s.classList.remove('active'));
+            document.getElementById('scr-lock').classList.add('active');
+        }
     </script>
 </body>
 </html>
