@@ -241,8 +241,7 @@
 
     <div class="screen" id="scr-t1">
         <div class="glass-universe">
-            <p class="text-cosmic">سلام مهم نتي عارفة علاش صيبت لك هادا أو عارفا علاش ، يك وخا أنا متناقض بعد مرات ولكن دكشي لفراسك هوا لصحيح اaاه بصراحة هادشي بدا من نهار تلاقيتك في مدينة حت ميمكنش نتوقع نشوفك انشوفك اومهم رك عارفة كمالة أ
-                ووفك .</p>
+            <p class="text-cosmic">سلام مهم نتي عارفة علاش صيبت لك هادا أو عارفا علاش ، يك وخا أنا متناقض بعد مرات ولكن دكشي لفراسك هوا لصحيح اaاه بصراحة هادشي بدا من نهار تلاقيتك في مدينة حت ميمكنش نتوقع نشوفك انشوفك اومهم رك عارفة كمالة أ ووفك .</p>
             <button class="btn-stellar" onclick="transit(4)">Next</button>
         </div>
     </div>
@@ -282,6 +281,7 @@
         let globalTime = 0;
 
         let snowflakes = [];
+        let sakuraPetals = []; 
         let fireworks = [];
         
         let heartProgress = 0; 
@@ -290,7 +290,6 @@
         let explodedShards = [];
         let fireworkInterval = null;
 
-        // محرك الصوت والموسيقى المحيطية المتطورة
         let audioCtx = null;
         let ambientOscillators = []; 
         let musicStarted = false;
@@ -305,20 +304,16 @@
             startAmbientMusic(); 
         }
 
-        // توليد موسيقى فضاء محيطية هادئة (Ambient Pad) خالية تماماً من أصوات البيانو
         function startAmbientMusic() {
             if (musicStarted) return;
             musicStarted = true;
 
             try {
-                // موجات جيبية ناعمة جداً تولد نغمات خلفية دافئة مستمرة
-                createPadTone(73.42, 0.05); // نغمة D2 أساسية عميقة هادئة
-                createPadTone(110.00, 0.03); // نغمة A2 متناغمة معها بالفضاء
+                createPadTone(73.42, 0.05); 
+                createPadTone(110.00, 0.03); 
 
-                // دورة ألحان وترية الكترونية خفيفة جداً تظهر وتتلاشى بنعومة (كل 3 ثواني)
                 setInterval(() => {
                     if(audioCtx && !heartExploded) {
-                        // سلم نغمات فضائية دافئة وناعمة
                         let spaceNotes = [146.83, 164.81, 220.00, 293.66]; 
                         let randomNote = spaceNotes[Math.floor(Math.random() * spaceNotes.length)];
                         playSoftSpaceNote(randomNote);
@@ -331,7 +326,7 @@
         function createPadTone(freq, volume) {
             let osc = audioCtx.createOscillator();
             let gainNode = audioCtx.createGain();
-            osc.type = 'sine'; // موجة ناعمة خالية من ضربات البيانو
+            osc.type = 'sine'; 
             osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
             gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
             
@@ -352,8 +347,8 @@
                 filter.frequency.setValueAtTime(500, audioCtx.currentTime);
                 
                 gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-                gainNode.gain.linearRampToValueAtTime(0.02, audioCtx.currentTime + 1.2); // تدرج دخول ناعم جداً
-                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.8); // تلاشي بطيء جداً
+                gainNode.gain.linearRampToValueAtTime(0.02, audioCtx.currentTime + 1.2); 
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.8); 
                 
                 osc.connect(filter);
                 filter.connect(gainNode);
@@ -363,7 +358,6 @@
             } catch(e) {}
         }
 
-        // أصوات تفجيرات الألعاب النارية المتوازنة هيبياً
         function playExplosionSound(isMainSupernova = false) {
             if (!audioCtx) return;
             try {
@@ -381,12 +375,11 @@
                     filter.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 1.2);
                     gainNode.gain.setValueAtTime(0.8, audioCtx.currentTime);
                 } else {
-                    // أصوات فرعية منخفضة ومريحة
                     osc.frequency.setValueAtTime(130, audioCtx.currentTime);
                     osc.frequency.exponentialRampToValueAtTime(15, audioCtx.currentTime + 0.4);
                     filter.frequency.setValueAtTime(350, audioCtx.currentTime);
                     filter.frequency.exponentialRampToValueAtTime(15, audioCtx.currentTime + 0.4);
-                    gainNode.gain.setValueAtTime(0.25, audioCtx.currentTime); // خفض مستوى صوت الفرقعة الفرعية
+                    gainNode.gain.setValueAtTime(0.25, audioCtx.currentTime); 
                 }
                 
                 gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + (isMainSupernova ? 1.2 : 0.4));
@@ -407,8 +400,10 @@
         window.addEventListener('resize', resize);
         resize();
 
-        function initSnow() {
+        function initSnowAndSakura() {
             snowflakes = [];
+            sakuraPetals = [];
+            
             for (let i = 0; i < 180; i++) {
                 snowflakes.push({
                     x: Math.random() * canvas.width,
@@ -419,9 +414,23 @@
                     opacity: Math.random() * 0.6 + 0.2
                 });
             }
+
+            for (let i = 0; i < 45; i++) {
+                sakuraPetals.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    w: Math.random() * 6 + 4,
+                    h: Math.random() * 4 + 2,
+                    vx: Math.random() * 0.5 - 0.25,
+                    vy: Math.random() * 0.5 + 0.5,
+                    opacity: Math.random() * 0.6 + 0.2,
+                    rotation: Math.random() * Math.PI,
+                    rotationSpeed: Math.random() * 0.02 + 0.005
+                });
+            }
         }
 
-        function drawSnow() {
+        function drawSnowAndSakura() {
             for (let s of snowflakes) {
                 ctx.beginPath();
                 ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
@@ -429,6 +438,26 @@
                 ctx.fill();
                 s.y += s.vy; s.x += s.vx;
                 if (s.y > canvas.height) { s.y = -10; s.x = Math.random() * canvas.width; }
+            }
+
+            for (let p of sakuraPetals) {
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rotation);
+                ctx.beginPath();
+                ctx.ellipse(0, 0, p.w, p.h, 0, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 183, 197, ${p.opacity})`;
+                ctx.fill();
+                ctx.restore();
+
+                p.y += p.vy;
+                p.x += p.vx + Math.sin(globalTime + p.w) * 0.1;
+                p.rotation += p.rotationSpeed;
+
+                if (p.y > canvas.height) {
+                    p.y = -10;
+                    p.x = Math.random() * canvas.width;
+                }
             }
         }
 
@@ -489,6 +518,9 @@
                 
                 let limit = Math.floor(heartLinesCount * Math.min(heartProgress, 1));
                 
+                // حساب درجة اللون التدرجي بناءً على مدى اكتمال تشكل القلب (يبدأ من الأخضر 120 ويتغير بالتدريج)
+                let currentHue = 120 + (heartProgress * 180); 
+
                 for (let i = 0; i < limit; i++) {
                     let t1 = (i / heartLinesCount) * Math.PI * 2;
                     let t2 = t1 + Math.PI + Math.sin(globalTime * 0.3) * 0.5;
@@ -500,7 +532,9 @@
                     ctx.moveTo(p1.x, p1.y);
                     ctx.lineTo(p2.x, p2.y);
                     
-                    ctx.strokeStyle = `hsla(${190 + Math.sin(globalTime + i*0.02)*20}, 100%, 65%, 0.22)`;
+                    // اللون الموحد يتغير تدريجياً للقلب كله مع مرور الوقت حتى انتهاء التشكل
+                    ctx.strokeStyle = `hsla(${currentHue}, 100%, 65%, 0.22)`;
+                    
                     ctx.lineWidth = 1.3;
                     ctx.stroke();
                 }
@@ -529,10 +563,7 @@
 
         function triggerHeartExplosion(cx, cy, scale) {
             heartExploded = true;
-            
-            // إيقاف خط الموسيقى الخلفية بلطف لإبراز هيبة تفجير الهيكل الرئيسي
             ambientOscillators.forEach(osc => { try { osc.stop(); } catch(e){} });
-
             playExplosionSound(true); 
 
             for (let i = 0; i < heartLinesCount; i++) {
@@ -546,37 +577,40 @@
                     y: cy + pt.y,
                     vx: Math.cos(angle) * speed,
                     vy: Math.sin(angle) * speed,
-                    hue: Math.random() > 0.5 ? 195 : 310, 
+                    hue: Math.random() > 0.5 ? 120 : 300, 
                     alpha: 1
                 });
             }
 
-            // تم زيادة المدة الزمنية بين الإطلاقات لتخفيف الألعاب النارية بناءً على رغبتك (من 200ms إلى 550ms)
-            fireworkInterval = setInterval(launchFirework, 550); 
-
+            // إطلاق ألعاب نارية متعددة في نفس الوقت
+            fireworkInterval = setInterval(launchMultipleFireworks, 550); 
             document.getElementById('msg-stay').classList.add('reveal');
             document.getElementById('btn-reset-show').style.display = 'inline-block';
         }
 
-        function launchFirework() {
+        function launchMultipleFireworks() {
             if (!heartExploded) return;
-            // تم تقليل الإطلاق إلى قذيفة واحدة مريحة ومتفرقة بدلاً من قذيفتين معاً
-            let fx = Math.random() * canvas.width;
-            let fy = Math.random() * (canvas.height * 0.45) + 60;
-            let hue = Math.random() * 360;
+            
+            // قذائف تنفجر معاً في نفس اللحظة في أماكن متفرقة
+            let burstsCount = Math.floor(Math.random() * 2) + 2; 
+            
+            for(let b = 0; b < burstsCount; b++) {
+                let fx = Math.random() * canvas.width;
+                let fy = Math.random() * (canvas.height * 0.45) + 60;
+                let hue = Math.random() * 360;
 
-            playExplosionSound(false); 
+                playExplosionSound(false); 
 
-            // تقليل عدد شظايا اللعبة النارية الواحدة (من 70 إلى 45) لتبدو خفيفة وراقية بصرياً
-            for (let i = 0; i < 45; i++) {
-                let angle = (i / 45) * Math.PI * 2;
-                let speed = Math.random() * 5 + 2.5;
-                fireworks.push({
-                    x: fx, y: fy,
-                    vx: Math.cos(angle) * speed,
-                    vy: Math.sin(angle) * speed,
-                    alpha: 1, hue: hue, size: Math.random() * 2 + 1
-                });
+                for (let i = 0; i < 45; i++) {
+                    let angle = (i / 45) * Math.PI * 2;
+                    let speed = Math.random() * 5 + 2.5;
+                    fireworks.push({
+                        x: fx, y: fy,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        alpha: 1, hue: hue, size: Math.random() * 2 + 1
+                    });
+                }
             }
         }
 
@@ -610,7 +644,7 @@
                 drawGeometricFractal(cx, cy, globalTime);
                 drawGeometricFractal(cx, cy, -globalTime * 0.5);
             } else {
-                drawSnow(); 
+                drawSnowAndSakura(); 
                 drawGeometricHeart(); 
                 drawFireworks(); 
             }
@@ -619,7 +653,7 @@
             requestAnimationFrame(engineLoop);
         }
 
-        initSnow();
+        initSnowAndSakura();
         requestAnimationFrame(engineLoop);
 
         const displayInput = document.getElementById('secret-key');
