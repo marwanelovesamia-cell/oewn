@@ -188,6 +188,7 @@
             margin-bottom: 35px;
             z-index: 10;
             letter-spacing: 2px;
+            text-align: center;
         }
 
         .final-message.reveal {
@@ -201,6 +202,41 @@
             flex-direction: column;
             align-items: center;
             z-index: 5;
+            width: 100%;
+        }
+
+        /* شاشات الهواتف فقط: التعديل يتم هنا تلقائياً دون تخريب حجم الحاسوب */
+        @media (max-width: 600px) {
+            .title-neon {
+                font-size: 2.6rem;
+            }
+            .text-cosmic {
+                font-size: 1.15rem;
+                line-height: 1.9;
+            }
+            .glass-universe {
+                padding: 25px 15px;
+            }
+            .final-message {
+                font-size: 2.5rem;
+            }
+            .btn-stellar {
+                padding: 10px 40px;
+                font-size: 1.1rem;
+                margin-top: 20px;
+            }
+            .keypad-grid {
+                max-width: 240px;
+                gap: 10px;
+            }
+            .key-btn {
+                font-size: 1.3rem;
+            }
+            .input-stellar {
+                font-size: 1.6rem;
+                letter-spacing: 8px;
+                padding: 10px;
+            }
         }
     </style>
 </head>
@@ -465,11 +501,12 @@
             ctx.save();
             ctx.translate(cx, cy);
             let linesCount = 180;
-            let radiusModifier = Math.sin(time * 0.2) * 80;
+            let maxRadius = Math.min(canvas.width, canvas.height) * 0.85;
+            let radiusModifier = Math.sin(time * 0.2) * (maxRadius * 0.15);
 
             for (let i = 0; i < linesCount; i++) {
                 let angle = (i * Math.PI * 2) / linesCount;
-                let r = (Math.sin(angle * 4 + time) * 220) + (Math.cos(angle * 7 - time) * 140) + 400 + radiusModifier;
+                let r = (Math.sin(angle * 4 + time) * (maxRadius * 0.3)) + (Math.cos(angle * 7 - time) * (maxRadius * 0.2)) + (maxRadius * 0.5) + radiusModifier;
                 let x1 = Math.sin(angle) * (r * 0.2);
                 let y1 = Math.cos(angle) * (r * 0.2);
                 let x2 = Math.sin(angle + Math.sin(time + i * 0.04)) * r;
@@ -503,7 +540,8 @@
 
             let cx = canvas.width / 2;
             let cy = canvas.height / 2 - 20;
-            let scale = Math.min(canvas.width, canvas.height) * 0.022;
+            // ضبط مقياس رسم مخصص ذكي للهواتف برمجياً دون لمس الـ CSS
+            let scale = Math.min(canvas.width, canvas.height) * (window.innerWidth < 600 ? 0.016 : 0.022);
 
             if (!heartExploded) {
                 if (heartProgress < 1) {
@@ -518,8 +556,8 @@
                 
                 let limit = Math.floor(heartLinesCount * Math.min(heartProgress, 1));
                 
-                // حساب درجة اللون التدرجي بناءً على مدى اكتمال تشكل القلب (يبدأ من الأخضر 120 ويتغير بالتدريج)
-                let currentHue = 120 + (heartProgress * 180); 
+                // تدرج ألوان قوي جداً وغير متشابه إطلاقاً: يبدأ أخضر فاقع -> أصفر ناصع -> برتقالي ناري -> أحمر قوي
+                let currentHue = 120 + (heartProgress * 240); 
 
                 for (let i = 0; i < limit; i++) {
                     let t1 = (i / heartLinesCount) * Math.PI * 2;
@@ -532,10 +570,8 @@
                     ctx.moveTo(p1.x, p1.y);
                     ctx.lineTo(p2.x, p2.y);
                     
-                    // اللون الموحد يتغير تدريجياً للقلب كله مع مرور الوقت حتى انتهاء التشكل
-                    ctx.strokeStyle = `hsla(${currentHue}, 100%, 65%, 0.22)`;
-                    
-                    ctx.lineWidth = 1.3;
+                    ctx.strokeStyle = `hsla(${currentHue}, 100%, 55%, 0.25)`;
+                    ctx.lineWidth = 1.4;
                     ctx.stroke();
                 }
                 ctx.restore();
@@ -554,7 +590,7 @@
                     ctx.beginPath();
                     ctx.moveTo(s.x, s.y);
                     ctx.lineTo(s.x + s.vx * 2.5, s.y + s.vy * 2.5);
-                    ctx.strokeStyle = `hsla(${s.hue}, 100%, 70%, ${s.alpha})`;
+                    ctx.strokeStyle = `hsla(${s.hue}, 100%, 60%, ${s.alpha})`;
                     ctx.lineWidth = 2.5;
                     ctx.stroke();
                 }
@@ -577,12 +613,11 @@
                     y: cy + pt.y,
                     vx: Math.cos(angle) * speed,
                     vy: Math.sin(angle) * speed,
-                    hue: Math.random() > 0.5 ? 120 : 300, 
+                    hue: Math.random() > 0.5 ? 0 : 120, // شظايا الانفجار حمراء وخضراء قوية
                     alpha: 1
                 });
             }
 
-            // إطلاق ألعاب نارية متعددة في نفس الوقت
             fireworkInterval = setInterval(launchMultipleFireworks, 550); 
             document.getElementById('msg-stay').classList.add('reveal');
             document.getElementById('btn-reset-show').style.display = 'inline-block';
@@ -591,7 +626,6 @@
         function launchMultipleFireworks() {
             if (!heartExploded) return;
             
-            // قذائف تنفجر معاً في نفس اللحظة في أماكن متفرقة
             let burstsCount = Math.floor(Math.random() * 2) + 2; 
             
             for(let b = 0; b < burstsCount; b++) {
